@@ -1,0 +1,2 @@
+## Builder
+The builder pattern is used to create complex objects with constituent parts that must be created in the same order or using a specific algorithm. An external class controls the construction algorithm.
