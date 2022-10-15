@@ -18,11 +18,17 @@ limitations under the License.
 #include <iostream>
 #include <memory>
 
+// an implementation for using std::unique_ptr on c++11
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 // "Product"
 class Pizza {
  public:
   Pizza() = default;
-  Pizza(const Pizza& pizza) = delete;
+  Pizza(const Pizza&) = delete;
   ~Pizza() = default;
 
   void SetDough(const std::string& dough) { _dough = dough; }
@@ -43,11 +49,11 @@ class Pizza {
 class PizzaBuilder {
  public:
   PizzaBuilder() = default;
-  PizzaBuilder(const PizzaBuilder& pizza_builder) = delete;
+  PizzaBuilder(const PizzaBuilder&) = delete;
   virtual ~PizzaBuilder() {}
 
   Pizza* GetPizza() { return _pizza.get(); }
-  void CreateNewPizzaProduct() { _pizza = std::make_unique<Pizza>(); }
+  void CreateNewPizzaProduct() { _pizza = make_unique<Pizza>(); }
   virtual void BuildDough() = 0;
   virtual void BuildSauce() = 0;
   virtual void BuildTopping() = 0;
@@ -59,27 +65,30 @@ class PizzaBuilder {
 
 class HawaiianPizzaBuilder : public PizzaBuilder {
  public:
-  virtual ~HawaiianPizzaBuilder() {}
+  HawaiianPizzaBuilder() = default;
+  HawaiianPizzaBuilder(const HawaiianPizzaBuilder&) = delete;
+  ~HawaiianPizzaBuilder() final {}
 
-  virtual void BuildDough() { _pizza->SetDough("cross"); }
-  virtual void BuildSauce() { _pizza->SetSauce("mild"); }
-  virtual void BuildTopping() { _pizza->SetTopping("ham+pineapple"); }
+  void BuildDough() final { _pizza->SetDough("cross"); }
+  void BuildSauce() final { _pizza->SetSauce("mild"); }
+  void BuildTopping() final { _pizza->SetTopping("ham+pineapple"); }
 };
 
 class SpicyPizzaBuilder : public PizzaBuilder {
  public:
-  virtual ~SpicyPizzaBuilder() {}
+  SpicyPizzaBuilder() = default;
+  SpicyPizzaBuilder(const SpicyPizzaBuilder&) = delete;
+  ~SpicyPizzaBuilder() final {}
 
-  virtual void BuildDough() { _pizza->SetDough("pan baked"); }
-  virtual void BuildSauce() { _pizza->SetSauce("hot"); }
-  virtual void BuildTopping() { _pizza->SetTopping("pepperoni+salami"); }
+  void BuildDough() final { _pizza->SetDough("pan baked"); }
+  void BuildSauce() final { _pizza->SetSauce("hot"); }
+  void BuildTopping() final { _pizza->SetTopping("pepperoni+salami"); }
 };
 
 //----------------------------------------------------------------
 
 class Cook {
  public:
-  void OpenPizza() { _pizza_builder->GetPizza()->Open(); }
   void MakePizza(PizzaBuilder* pb) {
     _pizza_builder = pb;
     _pizza_builder->CreateNewPizzaProduct();
@@ -87,6 +96,7 @@ class Cook {
     _pizza_builder->BuildSauce();
     _pizza_builder->BuildTopping();
   }
+  void OpenPizza() { _pizza_builder->GetPizza()->Open(); }
  private:
   PizzaBuilder* _pizza_builder;
 };
@@ -94,12 +104,12 @@ class Cook {
 int main() {
   Cook cook;
 
-  HawaiianPizzaBuilder hawaiianPizzaBuilder;
-  cook.MakePizza(&hawaiianPizzaBuilder);
+  HawaiianPizzaBuilder hawaiian_pizza_builder;
+  cook.MakePizza(&hawaiian_pizza_builder);
   cook.OpenPizza();
 
-  SpicyPizzaBuilder spicyPizzaBuilder;
-  cook.MakePizza(&spicyPizzaBuilder);
+  SpicyPizzaBuilder spicy_pizza_builder;
+  cook.MakePizza(&spicy_pizza_builder);
   cook.OpenPizza();
 
   return 0;
