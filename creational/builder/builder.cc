@@ -1,7 +1,3 @@
-# Builder
-The builder pattern is used to create complex objects with constituent parts that must be created in the same order or using a specific algorithm. An external class controls the construction algorithm.
-
-```cpp
 /*
   Copyright 2022 Munseong Jeong <ryan.m.jeong@hotmail.com>
 
@@ -108,4 +104,3 @@ int main() {
 
   return 0;
 }
-```
