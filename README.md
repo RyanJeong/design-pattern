@@ -35,3 +35,4 @@ Behavioural patterns define manners of communication between classes and objects
 
 ## Reference:
 * [Gang of Four Design Patterns](http://www.blackwasp.co.uk/gofpatterns.aspx)
+* [C++ Programming: Code patterns design](https://en.wikibooks.org/wiki/C%2B%2B_Programming/Code/Design_Patterns)
