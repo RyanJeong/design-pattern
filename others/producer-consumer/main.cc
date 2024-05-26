@@ -1,3 +1,7 @@
+/*
+  Copyright 2024 Ryan M. Jeong <ryan.m.jeong@hotmail.com>
+*/
+
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -16,9 +20,6 @@ std::queue<std::vector<float>> data_queue;
 std::mutex queue_mutex;
 std::condition_variable data_condition;
 std::atomic<bool> running(true);
-std::random_device rd;
-std::mt19937 gen(rd());
-std::uniform_real_distribution<> dis(-1.0, 1.0);
 
 // Ctrl+C signal handler
 void signal_handler(int signum) {
@@ -28,6 +29,10 @@ void signal_handler(int signum) {
 
 // Data producer function
 void produce_data(int n) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> dis(-1.0, 1.0);
+
   auto start_time = std::chrono::steady_clock::now();
   while (running) {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));  // 0.5 seconds
