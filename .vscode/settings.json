@@ -1,0 +1,5 @@
+{
+  "C_Cpp.default.compilerPath": "/usr/bin/clang++-6.0",
+  "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json",
+  "editor.rulers": [80, 120]
+}
