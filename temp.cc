@@ -14,16 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <string>
 #include <iostream>
 #include <memory>
+#include <string>
 
 // an implementation for using std::unique_ptr on c++11
-template<typename T, typename... Args>
+template <typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args) {
   return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-int main() {
-  return 0;
-}
+int main() { return 0; }
