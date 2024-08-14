@@ -1,0 +1,122 @@
+[
+    {
+        "directory": "behavioural/chain-of-responsibility",
+        "command": "g++ -o chain_of_responsibility behavioural/chain-of-responsibility/main.cc",
+        "file": "behavioural/chain-of-responsibility/main.cc"
+    },
+    {
+        "directory": "behavioural/command",
+        "command": "g++ -o command behavioural/command/main.cc",
+        "file": "behavioural/command/main.cc"
+    },
+    {
+        "directory": "behavioural/interpreter",
+        "command": "g++ -o interpreter behavioural/interpreter/main.cc",
+        "file": "behavioural/interpreter/main.cc"
+    },
+    {
+        "directory": "behavioural/iterator",
+        "command": "g++ -o iterator behavioural/iterator/main.cc",
+        "file": "behavioural/iterator/main.cc"
+    },
+    {
+        "directory": "behavioural/mediator",
+        "command": "g++ -o mediator behavioural/mediator/main.cc",
+        "file": "behavioural/mediator/main.cc"
+    },
+    {
+        "directory": "behavioural/memento",
+        "command": "g++ -o memento behavioural/memento/main.cc",
+        "file": "behavioural/memento/main.cc"
+    },
+    {
+        "directory": "behavioural/observer",
+        "command": "g++ -o observer behavioural/observer/main.cc",
+        "file": "behavioural/observer/main.cc"
+    },
+    {
+        "directory": "behavioural/state",
+        "command": "g++ -o state behavioural/state/main.cc",
+        "file": "behavioural/state/main.cc"
+    },
+    {
+        "directory": "behavioural/strategy",
+        "command": "g++ -o strategy behavioural/strategy/main.cc",
+        "file": "behavioural/strategy/main.cc"
+    },
+    {
+        "directory": "behavioural/template-method",
+        "command": "g++ -o template_method behavioural/template-method/main.cc",
+        "file": "behavioural/template-method/main.cc"
+    },
+    {
+        "directory": "behavioural/visitor",
+        "command": "g++ -o visitor behavioural/visitor/main.cc",
+        "file": "behavioural/visitor/main.cc"
+    },
+    {
+        "directory": "creational/abstract-factory",
+        "command": "g++ -o abstract_factory creational/abstract-factory/main.cc",
+        "file": "creational/abstract-factory/main.cc"
+    },
+    {
+        "directory": "creational/builder",
+        "command": "g++ -o builder creational/builder/main.cc",
+        "file": "creational/builder/main.cc"
+    },
+    {
+        "directory": "creational/factory-method",
+        "command": "g++ -o factory_method creational/factory-method/main.cc",
+        "file": "creational/factory-method/main.cc"
+    },
+    {
+        "directory": "creational/prototype",
+        "command": "g++ -o prototype creational/prototype/main.cc",
+        "file": "creational/prototype/main.cc"
+    },
+    {
+        "directory": "creational/singleton",
+        "command": "g++ -o singleton creational/singleton/main.cc",
+        "file": "creational/singleton/main.cc"
+    },
+    {
+        "directory": "structural/adapter",
+        "command": "g++ -o adapter structural/adapter/main.cc",
+        "file": "structural/adapter/main.cc"
+    },
+    {
+        "directory": "structural/bridge",
+        "command": "g++ -o bridge structural/bridge/main.cc",
+        "file": "structural/bridge/main.cc"
+    },
+    {
+        "directory": "structural/composite",
+        "command": "g++ -o composite structural/composite/main.cc",
+        "file": "structural/composite/main.cc"
+    },
+    {
+        "directory": "structural/decorator",
+        "command": "g++ -o decorator structural/decorator/main.cc",
+        "file": "structural/decorator/main.cc"
+    },
+    {
+        "directory": "structural/facade",
+        "command": "g++ -o facade structural/facade/main.cc",
+        "file": "structural/facade/main.cc"
+    },
+    {
+        "directory": "structural/flyweight",
+        "command": "g++ -o flyweight structural/flyweight/main.cc",
+        "file": "structural/flyweight/main.cc"
+    },
+    {
+        "directory": "structural/proxy",
+        "command": "g++ -o proxy structural/proxy/main.cc",
+        "file": "structural/proxy/main.cc"
+    },
+    {
+        "directory": "others/producer-consumer",
+        "command": "g++ -o producer_consumer others/producer-consumer/main.cc",
+        "file": "others/producer-consumer/main.cc"
+    }
+]
