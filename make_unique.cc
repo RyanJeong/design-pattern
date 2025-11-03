@@ -17,11 +17,17 @@ limitations under the License.
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
-// an implementation for using std::unique_ptr on c++11
+// In C++11, std::make_unique is not available. This function template
+// provides similar functionality.
 template <typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args) {
   return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-int main() { return 0; }
+int main() {
+  auto ptr = make_unique<std::string>("Hello, World!");
+  std::cout << *ptr << std::endl;
+  return 0;
+}
