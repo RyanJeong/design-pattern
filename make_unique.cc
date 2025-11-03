@@ -14,9 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <iostream>
 #include <memory>
-#include <string>
 #include <utility>
 
 // In C++11, std::make_unique is not available. This function template
@@ -25,6 +23,11 @@ template <typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args) {
   return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
+
+// == Example Usage ==
+
+#include <iostream>
+#include <string>
 
 int main() {
   auto ptr = make_unique<std::string>("Hello, World!");
