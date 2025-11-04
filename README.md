@@ -244,6 +244,82 @@ class Person {
 
 ---
 
+## C++ Constructor Patterns: `const&` vs. `by-value`
+
+### 1. Pass-by-Const-Reference
+
+This is the traditional C++03 approach. The argument is passed by reference, and the member variable is **copy-initialized** from it.
+
+```cpp
+Foo(const std::string& str) : str_(str) {}
+```
+
+- **Lvalue Input**
+
+  ```cpp
+  std::string s = "hi";
+  Foo f(s);
+  ```
+
+  - `str` binds to `s`.
+  - `str_` is **copy-constructed** from `s`.
+  - **Total Cost: 1 Copy**
+
+- **Rvalue Input**
+
+  ```cpp
+  Foo f("hello");
+  ```
+  
+  - A temporary `std::string` is created from `"hello"`.
+  - `str` binds to this temporary object.
+  - `str_` is **copy-constructed** from the temporary.
+  - **Total Cost: 1 Copy** (Suboptimal, as the temporary could have been moved)
+
+### 2. Pass-by-Value (and Move)
+
+This is a modern C++11 idiom, often called the "sink" pattern. The argument `str` is **value-initialized first**, and then the member `str_` **moves** from `str`.
+
+```cpp
+Foo(std::string str) : str_(std::move(str)) {}
+```
+
+- **Lvalue Input**
+
+   ```cpp
+   std::string s = "hi";
+   Foo f(s);
+   ```
+
+  - The parameter `str` is **copy-constructed** from `s`. (1 Copy)
+  - The member `str_` is **move-constructed** from the parameter `str`. (1 Move)
+  - **Total Cost: 1 Copy + 1 Move**
+
+- **Rvalue Input**
+
+  ```cpp
+  Foo f("hello");
+  ```
+
+  - The parameter `str` is **move-constructed** from the temporary object. (1 Move)
+  - The member `str_` is **move-constructed** from the parameter `str`. (1 Move)
+  - **Total Cost: 1-2 Moves (No Copy)**
+
+### Summary Table
+
+This table compares the *operation cost* to initialize the member `str_` based on the input type.
+
+| Constructor Pattern | Cost for Lvalue Input | Cost for Rvalue Input |
+| :--- | :--- | :--- |
+| **`const std::string& str`** | **1 Copy** | **1 Copy** |
+| **`std::string str`** | 1 Copy + 1 Move | **1-2 Moves** (Optimal) |
+
+#### Conclusion
+
+The **Pass-by-Value** (version 2) pattern is often preferred because it provides an automatic optimization for rvalues **without needing a second constructor overload** (i.e., `Foo(std::string&& str)`). It handles temporary objects (rvalues) very efficiently by moving their resources, avoiding an expensive copy.
+
+---
+
 ## References
 
 - **Gang of Four Design Patterns** - [BlackWasp](http://www.blackwasp.co.uk/gofpatterns.aspx)
