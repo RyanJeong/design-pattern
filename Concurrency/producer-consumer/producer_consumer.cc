@@ -21,7 +21,7 @@ int main() {
   for (int i = 1; i <= 2; ++i) {
     threads.emplace_back([buffer, i]() {
       Producer producer(buffer, i, 3);
-      producer.run();
+      producer.Run();
     });
   }
 
@@ -30,14 +30,13 @@ int main() {
   for (int i = 1; i <= 2; ++i) {
     threads.emplace_back([buffer, i]() {
       Consumer consumer(buffer, i, 3);
-      consumer.run();
+      consumer.Run();
     });
   }
 
   // Wait for all threads to complete
-  for (auto& thread : threads) {
+  for (auto& thread : threads)
     if (thread.joinable()) { thread.join(); }
-  }
 
   std::cout << "\n============================================\n"
             << "Demonstration complete\n"

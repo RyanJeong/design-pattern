@@ -3,8 +3,7 @@
 // Description: Producer-Consumer concurrency pattern implementation
 // Copyright 2025
 
-#ifndef CONCURRENCY_PRODUCER_CONSUMER_PRODUCER_CONSUMER_HPP_
-#define CONCURRENCY_PRODUCER_CONSUMER_PRODUCER_CONSUMER_HPP_
+#pragma once
 
 #include <chrono>
 #include <condition_variable>
@@ -55,7 +54,7 @@ class Buffer {
    * @side_effects Adds item to queue, notifies consumers
    * @throws None (noexcept)
    */
-  void produce(const Item& item) noexcept {
+  void Produce(const Item& item) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
 
     // Wait if buffer is full
@@ -74,7 +73,7 @@ class Buffer {
    * @side_effects Removes item from queue, notifies producers
    * @throws None (noexcept)
    */
-  Item consume() noexcept {
+  Item Consume() noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
 
     // Wait if buffer is empty
@@ -132,22 +131,35 @@ class Producer {
    * @side_effects None
    * @throws None (noexcept)
    */
+  // Take `buffer` by-value and move into the member to avoid an extra
+  // copy of the `std::shared_ptr` during construction. This keeps the
+  // call-site simple (pass by value) while ensuring only one copy of the
+  // owning handle is retained by the `Producer` instance.
   Producer(std::shared_ptr<Buffer> buffer, int id, int item_count) noexcept
-      : buffer_(buffer), id_(id), item_count_(item_count) {}
+    : buffer_(std::move(buffer)), id_(id), item_count_(item_count) {}
 
   /**
    * @brief Runs producer thread
    * @side_effects Produces items to buffer
    * @throws None (noexcept)
    */
-  void run() noexcept {
+  void Run() noexcept {
     for (int i = 0; i < item_count_; ++i) {
+      std::cout << "[Producer " << id_ << "] Producing item..." << std::endl;
+
       std::string data =
           "Item_P" + std::to_string(id_) + "_" + std::to_string(i);
       Item item(id_ * 100 + i, data);
-      buffer_->produce(item);
+      buffer_->Produce(item);
 
-      // Simulate production delay
+      // Simulate production delay.
+      // We choose a relatively short delay (100 ms) for the producer to
+      // simulate a source that produces items at a steady, moderate rate.
+      // Keeping producer faster than consumer is useful in examples/demos
+      // to create pressure on the buffer (so you can observe waiting,
+      // blocking, and condition-variable notifications). This value is
+      // arbitrary for illustration and can be tuned to demonstrate
+      // different behaviors (e.g., no backpressure vs. buffer growth).
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
   }
@@ -173,22 +185,33 @@ class Consumer {
    * @side_effects None
    * @throws None (noexcept)
    */
+  // Take `buffer` by-value and move into the member to avoid an extra
+  // copy of the `std::shared_ptr` during construction. The lambda that
+  // captures the shared_ptr will have already made one copy; moving the
+  // parameter into the member avoids a second copy at this point.
   Consumer(std::shared_ptr<Buffer> buffer, int id, int item_count) noexcept
-      : buffer_(buffer), id_(id), item_count_(item_count) {}
+    : buffer_(std::move(buffer)), id_(id), item_count_(item_count) {}
 
   /**
    * @brief Runs consumer thread
    * @side_effects Consumes items from buffer
    * @throws None (noexcept)
    */
-  void run() noexcept {
+  void Run() noexcept {
     for (int i = 0; i < item_count_; ++i) {
-      Item item = buffer_->consume();
+      std::cout << "[Consumer " << id_ << "] Attempting to consume item..." << std::endl;
 
-      // Simulate consumption delay
+      Item item = buffer_->Consume();
+
+      // Simulate consumption delay.
+      // The consumer intentionally uses a slightly longer delay (150 ms)
+      // than the producer. Making the consumer slower models a realistic
+      // processing step that takes more time than producing an item
+      // (e.g., I/O or CPU-heavy work). This intentional difference
+      // demonstrates how the buffer absorbs rate mismatches and how
+      // consumers/producers synchronize via condition variables when
+      // the buffer becomes empty or full (i.e., backpressure).
       std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
   }
 };
-
-#endif  // CONCURRENCY_PRODUCER_CONSUMER_PRODUCER_CONSUMER_HPP_

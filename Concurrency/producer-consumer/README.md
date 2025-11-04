@@ -12,15 +12,15 @@ The Producer-Consumer pattern is a concurrency design pattern that coordinates w
 ## Structure
 
 ```text
-+-------------+         +----------+         +-------------+
-| Producer 1  |         |  Buffer  |         | Consumer 1  |
-| (Thread)    |-------->|  (Queue) |-------->| (Thread)    |
--------------+         | (Mutex)  |         +-------------+
-                        | (CondVar)|
-+-------------+         +----------+         +-------------+
-| Producer 2  |              ^                | Consumer 2  |
-| (Thread)    |--------------|                | (Thread)    |
--------------+                               +-------------+
++-------------+         +-----------+         +-------------+
+| Producer 1  |-------->|           |-------->| Consumer 1  |
+| (Thread)    |         | Buffer    |         | (Thread)    |
++-------------+         | (Queue)   |         +-------------+
+                        | (Mutex)   |
++-------------+         | (CondVar) |         +-------------+
+| Producer 2  |-------->|           |-------->| Consumer 2  |
+| (Thread)    |         |           |         | (Thread)    |
++-------------+         +-----------+         +-------------+
 ```
 
 ## Key Components
@@ -62,22 +62,9 @@ The Producer-Consumer pattern is a concurrency design pattern that coordinates w
 
 ## Disadvantages
 
-- Requires careful synchronization management
-- Potential for deadlocks if misimplemented
+- Requires careful synchronization management (potential for deadlocks if misimplemented)
 - Memory overhead for buffer capacity
 - Complexity in error handling
-
-## Example Output
-
-```cpp
-Producer 1 produces: Item_1_0
-Producer 2 produces: Item_2_0
-Consumer 1 consumes: Item_1_0
-Consumer 2 consumes: Item_2_0
-Producer 1 produces: Item_1_1
-Producer 2 produces: Item_2_1
-...
-```
 
 ## Synchronization Primitives Used
 
@@ -92,3 +79,6 @@ Producer 2 produces: Item_2_1
 - `std::unique_lock`: With condition variable support
 - Lambda functions: Thread execution
 - `std::this_thread::sleep_for`: Timing control
+- Take-by-value + move: Producer/Consumer constructors accept the buffer as a
+  `std::shared_ptr<Buffer>` by value and move it into the member (e.g. `buffer_(std::move(buffer))`)
+  - Benefit: avoids one transient `shared_ptr` copy at construction (fewer atomic refcount ops) and clarifies ownership intent while preserving shared ownership semantics
