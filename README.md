@@ -1,130 +1,91 @@
-# design-pattern
+# Design Patterns
 
-Gang of Four Design Patterns
+A growing collection of design patterns implemented in C++14, starting with the Gang of Four (GoF) patterns and expanding with additional concurrency and architectural patterns.
 
-## [Creational Patterns](./creational/)
+## Pattern Categories
 
-Creational patterns provide ways to instantiate single objects or groups of related objects.
+### [Behavioral Patterns](./Behavioral/)
 
-* [Abstract Factory](./)
-* [Builder](./)
-* [Factory Method](./)
-* [Prototype](./)
-* [Singleton](./)
+Behavioral patterns define manners of communication between classes and objects. They help establish communication protocols and distribution of responsibilities among objects.
 
-## [Structural Patterns](./structural/)
+- [Chain of Responsibility](./Behavioral/chain-of-responsibility) - Pass requests along a chain of handlers
+- [Command](./Behavioral/command) - Encapsulate requests as objects
+- [Interpreter](./Behavioral/interpreter) - Define grammar for a language
+- [Iterator](./Behavioral/iterator) - Access collection elements sequentially
+- [Mediator](./Behavioral/mediator) - Reduce coupling between communicating classes
+- [Memento](./Behavioral/memento) - Capture and restore object state
+- [Observer](./Behavioral/observer) - Notify multiple objects about state changes
+- [State](./Behavioral/state) - Alter behavior based on internal state
+- [Strategy](./Behavioral/strategy) - Encapsulate interchangeable algorithms
+- [Template Method](./Behavioral/template-method) - Define algorithm skeleton in base class
+- [Visitor](./Behavioral/visitor) - Add operations to object structures
 
-Structural patterns provide a manner to define relationships between classes or objects.
+### [Creational Patterns](./Creational/)
 
-* [Adapter](./)
-* [Bridge](./)
-* [Composite](./)
-* [Decorator](./)
-* [Facade](./)
-* [Flyweight](./)
-* [Proxy](./)
+Creational patterns provide ways to instantiate single objects or groups of related objects. They abstract the instantiation process to make systems independent of how objects are created.
 
-## [Behavioural Patterns](./behavioural/)
+- [Abstract Factory](./Creational/abstract-factory) - Create families of related objects
+- [Builder](./Creational/builder) - Construct complex objects step by step
+- [Factory Method](./Creational/factory-method) - Create objects without specifying concrete classes
+- [Prototype](./Creational/prototype) - Create objects by cloning existing ones
+- [Singleton](./Creational/singleton) - Ensure single instance of a class
 
-Behavioural patterns define manners of communication between classes and objects.
+### [Structural Patterns](./Structural/)
 
-* [Chain of Responsibility](./)
-* [Command](./)
-* [Interpreter](./)
-* [Iterator](./)
-* [Mediator](./)
-* [Memento](./)
-* [Observer](./)
-* [State](./)
-* [Strategy](./)
-* [Template Method](./)
-* [Visitor](./)
+Structural patterns provide a manner to define relationships between classes or objects. They help ensure that changes in one part do not require changes in all other parts.
 
-## References
+- [Adapter](./Structural/adapter) - Make incompatible interfaces work together
+- [Bridge](./Structural/bridge) - Decouple abstraction from implementation
+- [Composite](./Structural/composite) - Compose objects into tree structures
+- [Decorator](./Structural/decorator) - Add functionality to objects dynamically
+- [Facade](./Structural/facade) - Provide simplified interface to complex subsystem
+- [Flyweight](./Structural/flyweight) - Share objects to reduce memory usage
+- [Proxy](./Structural/proxy) - Control access to another object
 
-* [Gang of Four Design Patterns](http://www.blackwasp.co.uk/gofpatterns.aspx)
-* [C++ Programming: Code patterns design](https://en.wikibooks.org/wiki/C%2B%2B_Programming/Code/Design_Patterns)
-* [PlantUML](https://plantuml.com/)
+### [Concurrency Patterns](./Concurrency/)
 
-## Appendix
+Concurrency patterns manage multi-threaded programming and synchronization between multiple threads. They provide solutions for coordinating thread execution and shared resource access.
 
-### [Connectors for relationships in UML class diagrams](https://www.drawio.com/blog/uml-class-diagrams)
+- [Producer-Consumer](./Concurrency/producer-consumer) - Decouple production and consumption using shared buffer
+- [ThreadPool](./Concurrency/threadpool) - Manage reusable worker threads for task execution
 
-![ArrowsInUmlClassDiagrams](./resources/arrows_in_uml_class_diagrams.png)
+---
 
-#### Association
+## Building and Running
 
-![Association](./resources/association.png)
+Each pattern is self-contained with its own build configuration:
 
-Association represents a relationship between two classes, indicating that one class knows about the other. This is depicted by a solid line connecting the two classes. For example, a Student enrolling in multiple Courses represents an association.
+```bash
+# Build all patterns in a category
+cd <Category> && ./build_all.sh
 
-```cpp
-class Course;  // Forward declaration
+# Build specific pattern
+cd <Category>/<pattern-name>
+mkdir -p build && cd build
+cmake ..
+make
 
-class Student {
- public:
-  void enroll(Course* course) { /* ... */ }
-};
-
-class Course {
- public:
-  void AddStudent(Student* student) { /* ... */ }
-};
+# Run pattern demonstration
+./<PatternName>
 ```
 
-#### Dependency
+---
 
-Dependency indicates that **one class temporarily uses another class**. If the definition of the dependent class (`Movie`) changes, it may affect the class that depends on it (`Person`), but not vice versa. This is typically seen when one class uses another class as a parameter.
+## Class Relationships
 
-```cpp
-class Movie {};
+Understanding relationships between classes is fundamental to design patterns. The following UML relationships are commonly used:
 
-class Person {
- public:
-  void watch(const Movie& movie) { /* ... */ }
-};
-```
+### Inheritance (Generalization)
 
-#### Aggregation
+Inheritance represents an "is-a" relationship where a subclass is a specialized version of a parent class. The subclass inherits attributes and behaviors from the parent class.
 
-Aggregation represents a relationship where one class contains another class as a part of itself. However, the contained class (`Address`) **can exist independently of the container class** (`Student`). This is a "whole-part" relationship where the part can exist independently of the whole.
-
-```cpp
-class Address {};
-
-class Student {
- private:
-  Address* address_;
-
- public:
-  Student(Address* addr) : address_(addr) { /* ... */ }
-};
-```
-
-#### Composition
-
-Composition is a stronger form of aggregation, indicating that one class (`Circle`) owns another class (`CentrePoint`), and the owned class **cannot exist independently of the owner**. If the owner is destroyed, the owned class is also destroyed.
-
-```cpp
-class CentrePoint {};
-
-class Circle {
- private:
-  CentrePoint centre_;
-
- public:
-  Circle() : centre_() { /* ... */ }
-};
-```
-
-#### Inheritance (Generalization)
-
-Inheritance (or generalization) shows that subclasses are **specialized versions of a parent class** ("is-a" relationship). The subclasses inherit attributes and behaviors from the parent class.
+**UML Notation:** Solid line with hollow arrowhead pointing to parent
 
 ```cpp
 class Shape {
  public:
   virtual void draw() = 0;
+  virtual ~Shape() = default;
 };
 
 class Rectangle : public Shape {
@@ -132,35 +93,168 @@ class Rectangle : public Shape {
   void draw() override { /* ... */ }
 };
 
-class Ellipse : public Shape {
+class Circle : public Shape {
  public:
   void draw() override { /* ... */ }
 };
 ```
 
-#### Implementation (Realization)
+**Key Characteristics:**
 
-Implementation (or realization) indicates that a class **implements the methods defined by an interface** (blueprint class). Each implementing class can have its own specific implementation of the interface's methods.
+- Represents "is-a" relationship
+- Subclass inherits all public and protected members
+- Enables polymorphism through virtual functions
+- Used in Template Method, Strategy, State patterns
+
+### Association
+
+Association represents a "knows-about" relationship between two classes, indicating that one class uses or interacts with another. This is the most general form of relationship.
+
+**UML Notation:** Solid line connecting the two classes
 
 ```cpp
-class Owner {
- public:
-  virtual void PurchaseItem() = 0;
-  virtual void SellItem() = 0;
+class Course {
+  // ...
 };
 
-class Person : public Owner {
- public:
-  void PurchaseItem() override { /* ... */ }
-  void SellItem() override { /* ... */ }
-};
-
-class Company : public Owner {
+class Student {
  private:
-  int vat_tax_number_;
+  std::vector<Course*> courses_;
 
  public:
-  void PurchaseItem() override { /* ... */ }
-  void SellItem() override { /* ... */ }
+  void enroll(Course* course) { courses_.push_back(course); }
 };
 ```
+
+**Key Characteristics:**
+
+- One object "knows about" another object
+- Most general relationship type
+- Objects can have independent lifespans
+- Used in many patterns (Observer, Mediator, etc.)
+
+#### Aggregation (Weak Composition)
+
+Aggregation is a specialized form of association representing a "part-of" or "has-a" relationship where the contained object **can exist independently** of the container. This is sometimes called "weak composition."
+
+**UML Notation:** Solid line with hollow diamond at the container end
+
+```cpp
+class Address {
+ public:
+  Address(const std::string& street, const std::string& city)
+      : street_(street), city_(city) {}
+ private:
+  std::string street_;
+  std::string city_;
+};
+
+class Student {
+ private:
+  Address* address_;  // Can exist independently
+
+ public:
+  Student(Address* addr) : address_(addr) {}
+  ~Student() { /* address_ is not deleted */ }
+};
+```
+
+**Key Characteristics:**
+
+- "Has-a" relationship with shared lifetime management
+- Contained object can exist without container
+- Container does not own the contained object
+- Typically uses raw pointers or shared ownership
+- Used in Composite, Flyweight patterns
+
+#### Composition (Strong Composition)
+
+Composition is a stronger form of association representing an "owns-a" relationship where the contained object **cannot exist independently** of the container. When the container is destroyed, the contained objects are also destroyed.
+
+**UML Notation:** Solid line with filled diamond at the container end
+
+```cpp
+class Point {
+ public:
+  Point(double x = 0, double y = 0) : x_(x), y_(y) {}
+ private:
+  double x_;
+  double y_;
+};
+
+class Circle {
+ private:
+  Point center_;  // Owned by Circle, cannot exist independently
+  double radius_;
+
+ public:
+  Circle(double x, double y, double r)
+      : center_(x, y), radius_(r) {}
+  ~Circle() { /* center_ is automatically destroyed */ }
+};
+```
+
+**Key Characteristics:**
+
+- Strongest form of "owns-a" relationship
+- Contained object's lifetime is bound to container
+- Container owns the contained object
+- Typically uses member variables or unique_ptr
+- Used in Composite, Decorator patterns
+
+### Dependency
+
+Dependency indicates that one class temporarily uses another class. The dependent class can function without the other, but may require it for specific operations. If the dependency class definition changes, it may affect the dependent class, but generally not vice versa.
+
+**UML Notation:** Dashed line with hollow arrowhead
+
+```cpp
+class Movie {
+ public:
+  std::string getTitle() const { return title_; }
+ private:
+  std::string title_;
+};
+
+class Person {
+ public:
+  void watch(const Movie& movie) {
+    std::cout << "Watching: " << movie.getTitle() << std::endl;
+  }
+};
+```
+
+**Key Characteristics:**
+
+- "Uses" relationship, typically temporary
+- Dependent class does not hold reference to dependency
+- Often appears as function parameters
+- Weakest form of coupling
+- Common in Strategy, Command patterns
+
+## UML Relationship Summary
+
+| Relationship | Notation | Meaning | Lifetime | Ownership |
+|--------------|----------|---------|----------|-----------|
+| **Inheritance** | Solid line + hollow arrow | Is-a | Parent outlives children | N/A |
+| **Association** | Solid line | Knows-about | Independent | None |
+| **Aggregation** | Solid line + hollow diamond | Part-of (weak) | Independent | Shared |
+| **Composition** | Solid line + filled diamond | Owns (strong) | Container owns | Container |
+| **Dependency** | Dashed line + hollow arrow | Uses | Temporary | None |
+
+---
+
+## References
+
+- **Gang of Four Design Patterns** - [BlackWasp](http://www.blackwasp.co.uk/gofpatterns.aspx)
+  - Comprehensive overview of all 23 GoF design patterns with C# examples
+- **C++ Design Patterns** - [Wikibooks](https://en.wikibooks.org/wiki/C%2B%2B_Programming/Code/Design_Patterns)
+  - C++ specific implementation of design patterns
+- **Modern C++ (C++14 and beyond)** - [cppreference.com](https://en.cppreference.com/)
+- **PlantUML** - [plantuml.com](https://plantuml.com/)
+
+---
+
+## License
+
+This project is licensed under the [Apache License](./LICENSE)

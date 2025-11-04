@@ -1,122 +1,159 @@
-# Builder
-The builder pattern is used to create complex objects with constituent parts that must be created in the same order or using a specific algorithm. An external class controls the construction algorithm.
+# Builder Pattern
 
-```cpp
-/*
-  Copyright 2022 Munseong Jeong <ryan.m.jeong@hotmail.com>
+## Pattern Overview
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+The **Builder Pattern** separates the construction of a complex object from its representation, allowing step-by-step construction and different representations of the same object.
 
-  http://www.apache.org/licenses/LICENSE-2.0
+## Intent
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+- Separate complex object construction from representation
+- Provide step-by-step construction process
+- Support construction of different representations
+- Use fluent interface for readable code
 
-#include <string>
-#include <iostream>
-#include <memory>
-
-// an implementation for using std::unique_ptr on c++11
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args) {
-  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
-// "Product"
-class Pizza {
- public:
-  Pizza() = default;
-  Pizza(const Pizza&) = delete;
-  ~Pizza() = default;
-
-  void SetDough(const std::string& dough) { _dough = dough; }
-  void SetSauce(const std::string& sauce) { _sauce = sauce; }
-  void SetTopping(const std::string& topping) { _topping = topping; }
-  void Open() const {
-    std::cout << "Pizza with " << _dough
-        << " dough, " << _sauce
-        << " sauce and " << _topping << " topping." << std::endl;
-  }
- private:
-  std::string _dough;
-  std::string _sauce;
-  std::string _topping;
-};
-
-// "Abstract Builder"
-class PizzaBuilder {
- public:
-  PizzaBuilder() = default;
-  PizzaBuilder(const PizzaBuilder&) = delete;
-  virtual ~PizzaBuilder() {}
-
-  Pizza* GetPizza() { return _pizza.get(); }
-  void CreateNewPizzaProduct() { _pizza = make_unique<Pizza>(); }
-  virtual void BuildDough() = 0;
-  virtual void BuildSauce() = 0;
-  virtual void BuildTopping() = 0;
- protected:
-  std::unique_ptr<Pizza> _pizza;
-};
-
-//----------------------------------------------------------------
-
-class HawaiianPizzaBuilder : public PizzaBuilder {
- public:
-  HawaiianPizzaBuilder() = default;
-  HawaiianPizzaBuilder(const HawaiianPizzaBuilder&) = delete;
-  ~HawaiianPizzaBuilder() final {}
-
-  void BuildDough() final { _pizza->SetDough("cross"); }
-  void BuildSauce() final { _pizza->SetSauce("mild"); }
-  void BuildTopping() final { _pizza->SetTopping("ham+pineapple"); }
-};
-
-class SpicyPizzaBuilder : public PizzaBuilder {
- public:
-  SpicyPizzaBuilder() = default;
-  SpicyPizzaBuilder(const SpicyPizzaBuilder&) = delete;
-  ~SpicyPizzaBuilder() final {}
-
-  void BuildDough() final { _pizza->SetDough("pan baked"); }
-  void BuildSauce() final { _pizza->SetSauce("hot"); }
-  void BuildTopping() final { _pizza->SetTopping("pepperoni+salami"); }
-};
-
-//----------------------------------------------------------------
-
-class Cook {
- public:
-  void MakePizza(PizzaBuilder* pb) {
-    _pizza_builder = pb;
-    _pizza_builder->CreateNewPizzaProduct();
-    _pizza_builder->BuildDough();
-    _pizza_builder->BuildSauce();
-    _pizza_builder->BuildTopping();
-  }
-  void OpenPizza() { _pizza_builder->GetPizza()->Open(); }
- private:
-  PizzaBuilder* _pizza_builder;
-};
-
-int main() {
-  Cook cook;
-
-  HawaiianPizzaBuilder hawaiian_pizza_builder;
-  cook.MakePizza(&hawaiian_pizza_builder);
-  cook.OpenPizza();
-
-  SpicyPizzaBuilder spicy_pizza_builder;
-  cook.MakePizza(&spicy_pizza_builder);
-  cook.OpenPizza();
-
-  return 0;
-}
+## Structure
 
 ```
+┌──────────────────────┐
+│     Computer         │ (Product)
+├──────────────────────┤
+│ - cpu                │
+│ - ram                │
+│ - storage            │
+│ - gpu                │
+└──────────────────────┘
+         ▲
+         │
+┌──────────────────────┐
+│ ComputerBuilder      │ (Abstract Builder)
+├──────────────────────┤
+│ + set_cpu()          │
+│ + set_ram()          │
+│ + build()            │
+└──────────────────────┘
+         ▲
+         │
+    ┌────┴────┐
+    │          │
+┌───────────┐  ┌──────────────┐
+│ Gaming    │  │ Workstation  │
+│ Builder   │  │ Builder      │
+└───────────┘  └──────────────┘
+```
+
+## Implementation Details
+
+### Builder Pattern Components
+
+1. **Product (Computer)**: Complex object being built
+2. **Abstract Builder (ComputerBuilder)**: Interface for construction steps
+3. **Concrete Builders**: Specific implementations (Gaming, Workstation)
+
+### Fluent Interface
+
+Methods return reference to builder for method chaining:
+
+```cpp
+Computer pc = builder
+    .set_cpu("Intel Core i9")
+    .set_ram("32GB DDR5")
+    .set_storage("2TB SSD")
+    .set_gpu("RTX 4090")
+    .build();
+```
+
+## Use Cases
+
+- Object configuration (UI components, HTTP requests)
+- Complex data structures (documents, configurations)
+- Constructors with many optional parameters
+- Immutable objects
+- Object creation with validation
+
+## Advantages
+
+✓ Separates construction from representation
+✓ Flexible step-by-step construction
+✓ Same builder can build different representations
+✓ Better code readability with fluent interface
+✓ Immutable objects after construction
+
+## Disadvantages
+
+✗ More classes needed
+✗ Increased memory usage
+✗ Not beneficial for simple objects
+✗ Requires mutable state during construction
+
+## Related Patterns
+
+- **Abstract Factory**: Often combined with Builder
+- **Factory Method**: Alternative for object creation
+- **Composite**: Can use Builder for construction
+
+## Compilation & Execution
+
+```bash
+mkdir -p build
+cd build
+cmake ..
+make
+./Builder
+```
+
+## Expected Output
+
+```
+=== Gaming PC ===
+Computer Configuration:
+  CPU: Intel Core i9-12900K
+  RAM: 32GB DDR5
+  Storage: 2TB NVMe SSD
+  GPU: RTX 4090
+
+=== Workstation ===
+Computer Configuration:
+  CPU: Intel Xeon
+  RAM: 64GB DDR4
+  Storage: 2TB NVMe SSD
+  GPU: RTX A6000
+
+=== Custom PC ===
+Computer Configuration:
+  CPU: AMD Ryzen 7
+  RAM: 16GB DDR4
+  Storage: 512GB SSD
+  GPU: RTX 3060
+```
+
+## Key Classes
+
+- **Computer**: Product class with CPU, RAM, Storage, GPU
+- **ComputerBuilder**: Abstract builder with fluent interface
+- **GamingComputerBuilder**: Builds gaming-optimized computers
+- **WorkstationBuilder**: Builds workstation computers
+
+## Example Usage
+
+```cpp
+// Gaming PC builder
+GamingComputerBuilder builder;
+Computer pc = builder
+    .set_cpu("Intel Core i9-12900K")
+    .set_ram("32GB DDR5")
+    .build();
+
+// Custom builder
+ComputerBuilder custom;
+Computer custom_pc = custom
+    .set_cpu("AMD Ryzen 7")
+    .set_ram("16GB")
+    .build();
+```
+
+## Notes
+
+- Fluent interface makes complex construction readable
+- Builders can have default configurations
+- Method chaining improves API design
+- Consider immutability of final product
