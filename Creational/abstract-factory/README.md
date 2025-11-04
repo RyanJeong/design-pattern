@@ -14,31 +14,29 @@ The **Abstract Factory Pattern** provides an interface for creating families of 
 ## Structure
 
 ```
-┌───────────────────────────────────┐
-│         UIFactory                 │ (Abstract Factory)
-├───────────────────────────────────┤
-│ + create_button()                 │
-│ + create_checkbox()               │
-└───────────────────────────────────┘
-         ▲                    ▲
-         │                    │
-    ┌────┴──┐            ┌────┴──┐
-    │        │            │       │
-┌──────────┐ ┌────────────┐
-│ Windows  │ │   Mac      │
-│ Factory  │ │  Factory   │
-└──────────┘ └────────────┘
-    │              │
-    ├─────┬───────┤
-    │     │       │
-  Button Checkbox (Abstract Products)
-    │     │       │
-    └─────┼───────┘
-        ┌─┴─┐
-    ┌───┘   └───┐
-    │           │
-(Windows)   (Mac)
-Products   Products
+-------------------------------
+|         UIFactory            | (Abstract Factory)
+|------------------------------|
+| + create_button()            |
+| + create_checkbox()          |
+-------------------------------
+     ^                    ^
+     |                    |
+  +----+--+            +----+--+
+  |        |            |       |
+ +----------+ +----------+
+ | Windows  | |   Mac    |
+ | Factory  | |  Factory |
+ +----------+ +----------+
+  |              |
+  +----+----+----+
+     |    |
+    Button Checkbox (Abstract Products)
+     |    |
+     +----+
+     |
+    (Windows)   (Mac)
+    Products     Products
 ```
 
 ## Implementation Details
@@ -69,18 +67,18 @@ class UIFactory {
 
 ## Advantages
 
-✓ Isolates concrete classes
-✓ Ensures product family consistency
-✓ Makes switching families easy
-✓ Loose coupling between product families
-✓ Follows Single Responsibility Principle
+- Isolates concrete classes
+- Ensures product family consistency
+- Makes switching families easy
+- Loose coupling between product families
+- Follows Single Responsibility Principle
 
 ## Disadvantages
 
-✗ Complex design with many classes
-✗ Difficult to add new product types
-✗ Code might be overkill for simple scenarios
-✗ Challenging to extend with new products
+- Complex design with many classes
+- Difficult to add new product types
+- Code might be overkill for simple scenarios
+- Challenging to extend with new products
 
 ## Related Patterns
 

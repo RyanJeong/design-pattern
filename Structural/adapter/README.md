@@ -14,30 +14,30 @@ The **Adapter Pattern** makes incompatible interfaces work together by providing
 ## Structure
 
 ```
-┌─────────────────┐
-│  MediaPlayer    │ (Target)
-└─────────────────┘
-         ▲
-         │
-    ┌────┴──────────┐
-    │               │
-┌──────────┐  ┌──────────────┐
-│ Audio    │  │ MediaAdapter │ (Adapter)
-│ Player   │  └──────────────┘
-└──────────┘        │
-                    │uses
-                    ▼
-         ┌─────────────────────┐
-         │AdvancedMediaPlayer  │ (Adaptee)
-         └─────────────────────┘
-              ▲            ▲
-              │            │
-         ┌────┘            └────┐
-         │                      │
-    ┌────────┐            ┌─────────┐
-    │ Vlc    │            │ Mkv     │
-    │ Player │            │ Player  │
-    └────────┘            └─────────┘
++-----------------+
+|  MediaPlayer    | (Target)
++-----------------+
+      ^
+      |
+    +----+----------+
+    |               |
++----------+  +--------------+
+| Audio    |  | MediaAdapter  | (Adapter)
+| Player   |  +--------------+
++----------+        |
+        | uses
+        v
+      +---------------------+
+      |AdvancedMediaPlayer  | (Adaptee)
+      +---------------------+
+        ^            ^
+        |            |
+      +----+            +----+
+      |                      |
+    +--------+            +---------+
+    | Vlc    |            | Mkv     |
+    | Player |            | Player  |
+    +--------+            +---------+
 ```
 
 ## Implementation Details
@@ -65,18 +65,18 @@ class MediaAdapter : public MediaPlayer {
 
 ## Advantages
 
-✓ Makes incompatible interfaces compatible
-✓ Promotes code reuse
-✓ No modification of original classes needed
-✓ Single Responsibility Principle
-✓ Open/Closed Principle
+- Makes incompatible interfaces compatible
+- Promotes code reuse
+- No modification of original classes needed
+- Single Responsibility Principle
+- Open/Closed Principle
 
 ## Disadvantages
 
-✗ Adds complexity
-✗ Additional objects created
-✗ May reduce performance slightly
-✗ Can be overused
+- Adds complexity
+- Additional objects created
+- May reduce performance slightly
+- Can be overused
 
 ## Related Patterns
 

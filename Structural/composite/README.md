@@ -14,22 +14,22 @@ The **Composite Pattern** allows you to compose objects into tree structures to 
 ## Structure
 
 ```
-┌─────────────┐
-│  Component  │ (Base)
-├─────────────┤
-│ + add()     │
-│ + display() │
-└─────────────┘
-       ▲
-       │
-   ┌───┴──────┐
-   │          │
-┌────────┐ ┌──────────────┐
-│ File   │ │ Directory    │ (Composite)
-│(Leaf)  │ └──────────────┘
-└────────┘   - children
-             + add()
-             + display()
++-------------+
+|  Component  | (Base)
+|-------------|
+| + add()     |
+| + display() |
++-------------+
+       ^
+       |
+   +---+------+ 
+   |          |
+ +--------+ +--------------+
+ | File   | | Directory    | (Composite)
+ |(Leaf)  | +--------------+
+ +--------+   - children
+              + add()
+              + display()
 ```
 
 ## Implementation Details
@@ -65,18 +65,18 @@ root.add(std::move(home));
 
 ## Advantages
 
-✓ Simplifies client code (uniform treatment)
-✓ Easy to add new component types
-✓ Natural representation of hierarchies
-✓ Recursive composition support
-✓ Follows Open/Closed Principle
+- Simplifies client code (uniform treatment)
+- Easy to add new component types
+- Natural representation of hierarchies
+- Recursive composition support
+- Follows Open/Closed Principle
 
 ## Disadvantages
 
-✗ May be overly general for simple structures
-✗ Type-specific operations difficult
-✗ Performance overhead for large trees
-✗ Complex design for simple use cases
+- May be overly general for simple structures
+- Type-specific operations difficult
+- Performance overhead for large trees
+- Complex design for simple use cases
 
 ## Related Patterns
 

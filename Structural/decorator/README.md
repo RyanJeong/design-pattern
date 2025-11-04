@@ -14,28 +14,28 @@ The **Decorator Pattern** attaches additional responsibilities to an object dyna
 ## Structure
 
 ```
-┌──────────────┐
-│  Component   │ (Base Interface)
-├──────────────┤
-│ + operation()│
-└──────────────┘
-       ▲
-       │
-   ┌───┴──────────┐
-   │              │
-┌──────────┐  ┌──────────────┐
-│ Simple   │  │ Decorator    │
-│Component │  ├──────────────┤
-└──────────┘  │ - component  │
-              │ + operation()│
-              └──────────────┘
-                     ▲
-                     │
-                ┌────┴────┬───────┬────────┐
-                │         │       │        │
-            ┌────────┐┌──────┐┌─────────┐┌───────┐
-            │ Milk   ││ Sugar││Chocolate││ ...   │
-            └────────┘└──────┘└─────────┘└───────┘
++--------------+
+|  Component   | (Base Interface)
+|--------------|
+| + operation()|
++--------------+
+     ^
+     |
+   +---+----------+
+   |              |
+ +--------+  +--------------+
+ | Simple |  |  Decorator   |
+ |Component|  |--------------|
+ +--------+  | - component  |
+       | + operation()|
+       +--------------+
+          ^
+          |
+         +----+----+----+--------+
+         |         |    |        |
+       +--------+ +------+ +---------+ +-------+
+       | Milk   | | Sugar| |Chocolate| | ...   |
+       +--------+ +------+ +---------+ +-------+
 ```
 
 ## Implementation Details
@@ -71,19 +71,19 @@ auto coffee = std::make_unique<ChocolateDecorator>(
 
 ## Advantages
 
-✓ More flexible than inheritance
-✓ Single Responsibility Principle
-✓ Combine features at runtime
-✓ Avoid class proliferation
-✓ Same interface maintained
+- More flexible than inheritance
+- Single Responsibility Principle
+- Combine features at runtime
+- Avoid class proliferation
+- Same interface maintained
 
 ## Disadvantages
 
-✗ Creates many small objects
-✗ Complex ordering of decorators
-✗ Difficult to remove specific decorator
-✗ Performance overhead
-✗ Harder to understand than inheritance
+- Creates many small objects
+- Complex ordering of decorators
+- Difficult to remove specific decorator
+- Performance overhead
+- Harder to understand than inheritance
 
 ## Related Patterns
 

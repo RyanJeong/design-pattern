@@ -14,31 +14,31 @@ The **Builder Pattern** separates the construction of a complex object from its 
 ## Structure
 
 ```
-┌──────────────────────┐
-│     Computer         │ (Product)
-├──────────────────────┤
-│ - cpu                │
-│ - ram                │
-│ - storage            │
-│ - gpu                │
-└──────────────────────┘
-         ▲
-         │
-┌──────────────────────┐
-│ ComputerBuilder      │ (Abstract Builder)
-├──────────────────────┤
-│ + set_cpu()          │
-│ + set_ram()          │
-│ + build()            │
-└──────────────────────┘
-         ▲
-         │
-    ┌────┴────┐
-    │          │
-┌───────────┐  ┌──────────────┐
-│ Gaming    │  │ Workstation  │
-│ Builder   │  │ Builder      │
-└───────────┘  └──────────────┘
+-----------------------
+|     Computer         | (Product)
+|----------------------|
+| - cpu                |
+| - ram                |
+| - storage            |
+| - gpu                |
+-----------------------
+      ^
+      |
+-----------------------
+| ComputerBuilder      | (Abstract Builder)
+|----------------------|
+| + set_cpu()          |
+| + set_ram()          |
+| + build()            |
+-----------------------
+      ^
+      |
+    +----+----+
+    |         |
+ +---------+ +-------------+
+ | Gaming  | | Workstation |
+ | Builder | | Builder     |
+ +---------+ +-------------+
 ```
 
 ## Implementation Details
@@ -72,18 +72,18 @@ Computer pc = builder
 
 ## Advantages
 
-✓ Separates construction from representation
-✓ Flexible step-by-step construction
-✓ Same builder can build different representations
-✓ Better code readability with fluent interface
-✓ Immutable objects after construction
+- Separates construction from representation
+- Flexible step-by-step construction
+- Same builder can build different representations
+- Better code readability with fluent interface
+- Immutable objects after construction
 
 ## Disadvantages
 
-✗ More classes needed
-✗ Increased memory usage
-✗ Not beneficial for simple objects
-✗ Requires mutable state during construction
+- More classes needed
+- Increased memory usage
+- Not beneficial for simple objects
+- Requires mutable state during construction
 
 ## Related Patterns
 

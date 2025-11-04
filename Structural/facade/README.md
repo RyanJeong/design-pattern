@@ -14,18 +14,18 @@ The **Facade Pattern** provides a unified, simplified interface to a set of inte
 ## Structure
 
 ```
-┌────────────────────┐
-│    Facade          │
-├────────────────────┤
-│ - cpu, memory, hd  │
-│ + start()          │
-│ + shutdown()       │
-└────────────────────┘
-    │      │      │
-    ▼      ▼      ▼
-┌──────┐┌────────┐┌──────────┐
-│ CPU  ││ Memory ││ HardDrive│ (Subsystems)
-└──────┘└────────┘└──────────┘
++--------------------+
+|    Facade          |
+|--------------------|
+| - cpu, memory, hd  |
+| + start()          |
+| + shutdown()       |
++--------------------+
+  |      |      |
+  v      v      v
+ +------+ +--------+ +----------+
+ | CPU  | | Memory | | HardDrive| (Subsystems)
+ +------+ +--------+ +----------+
 ```
 
 ## Implementation Details
@@ -58,19 +58,19 @@ class ComputerFacade {
 
 ## Advantages
 
-✓ Simplifies client code
-✓ Decouples client from complex subsystems
-✓ Reduces dependencies
-✓ Promotes subsystem independence
-✓ Eases maintenance
+- Simplifies client code
+- Decouples client from complex subsystems
+- Reduces dependencies
+- Promotes subsystem independence
+- Eases maintenance
 
 ## Disadvantages
 
-✗ Facade can become too large
-✗ May hide important details
-✗ Can limit flexibility
-✗ May not be needed for simple systems
-✗ Additional abstraction layer
+- Facade can become too large
+- May hide important details
+- Can limit flexibility
+- May not be needed for simple systems
+- Additional abstraction layer
 
 ## Related Patterns
 

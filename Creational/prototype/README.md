@@ -15,28 +15,27 @@ The **Prototype Pattern** creates new objects by copying an existing object (pro
 ## Structure
 
 ```
-┌──────────────┐
-│    Shape     │ (Prototype Interface)
-├──────────────┤
-│ + clone()    │
-│ + display()  │
-└──────────────┘
-       ▲
-       │
-   ┌───┴──────┐
-   │          │
-┌────────┐ ┌──────────┐
-│ Circle │ │Rectangle │
-└────────┘ └──────────┘
+-------------------
+|    Shape         | (Prototype Interface)
+|------------------|
+| + clone()        |
+| + display()      |
+------------------+
+       ^
+       |
+   +---+----+
+   |        |
+ +--------+ +----------+
+ | Circle | |Rectangle |
+ +--------+ +----------+
 
-┌─────────────────┐
-│ ShapeRegistry   │
-├─────────────────┤
-│ - prototypes    │
-├─────────────────┤
-│ + register()    │
-│ + create_shape()│
-└─────────────────┘
+---------------------
+| ShapeRegistry      |
+|--------------------|
+| - prototypes       |
+| + register()       |
+| + create_shape()   |
+---------------------
 ```
 
 ## Implementation Details
@@ -76,19 +75,19 @@ class ShapeRegistry {
 
 ## Advantages
 
-✓ Avoids subclassing and complex creation logic
-✓ Efficient object creation by cloning
-✓ Dynamic object creation at runtime
-✓ Reduces initialization overhead
-✓ Flexibility in object variations
+- Avoids subclassing and complex creation logic
+- Efficient object creation by cloning
+- Dynamic object creation at runtime
+- Reduces initialization overhead
+- Flexibility in object variations
 
 ## Disadvantages
 
-✗ Copy constructors must implement deep copying
-✗ Circular reference handling is complex
-✗ Cloning large objects can be expensive
-✗ Not suitable for all object types
-✗ Requires careful handling of pointers/references
+- Copy constructors must implement deep copying
+- Circular reference handling is complex
+- Cloning large objects can be expensive
+- Not suitable for all object types
+- Requires careful handling of pointers/references
 
 ## Related Patterns
 

@@ -14,21 +14,21 @@ The **Flyweight Pattern** reduces memory usage by sharing common state between m
 ## Structure
 
 ```
-┌───────────────────────┐
-│ FlyweightFactory      │
-├───────────────────────┤
-│ - flyweights (cache)  │
-│ + get_flyweight()     │
-└───────────────────────┘
-           │
-           │creates/returns
-           ▼
-┌──────────────────┐
-│   Flyweight      │ (Intrinsic state)
-├──────────────────┤
-│ - font (shared)  │
-│ - size (shared)  │
-└──────────────────┘
++-----------------------+
+| FlyweightFactory      |
+|-----------------------|
+| - flyweights (cache)  |
+| + get_flyweight()     |
++-----------------------+
+           |
+           | creates/returns
+           v
++------------------+
+|   Flyweight      | (Intrinsic state)
+|------------------|
+| - font (shared)  |
+| - size (shared)  |
++------------------+
 
 Client provides Extrinsic state:
 - Position (x, y)
@@ -74,19 +74,19 @@ class FlyweightFactory {
 - Web browser rendering
 
 ## Advantages
-
-✓ Dramatically reduces memory usage
-✓ Improves performance for large object counts
-✓ Centralizes shared state management
-✓ Efficient resource pooling
+ 
+- Dramatically reduces memory usage
+- Improves performance for large object counts
+- Centralizes shared state management
+- Efficient resource pooling
 
 ## Disadvantages
 
-✗ Increased CPU overhead from lookup
-✗ Thread safety complexity
-✗ Difficult to debug
-✗ Not beneficial for small object counts
-✗ Separates intrinsic/extrinsic state
+- Increased CPU overhead from lookup
+- Thread safety complexity
+- Difficult to debug
+- Not beneficial for small object counts
+- Separates intrinsic/extrinsic state
 
 ## Related Patterns
 

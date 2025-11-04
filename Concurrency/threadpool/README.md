@@ -7,19 +7,19 @@ The ThreadPool pattern manages a collection of reusable worker threads that exec
 ## Structure
 
 ```text
-┌──────────────────────────────────────┐
-│         ThreadPool (Manager)         │
-├──────────────────────────────────────┤
-│  Queue: [Task1] [Task2] [Task3] ... │
-├──────────────────────────────────────┤
-│ ┌─────────┐ ┌─────────┐ ┌─────────┐ │
-│ │ Worker1 │ │ Worker2 │ │ Worker3 │ │
-│ │ (Thread)│ │ (Thread)│ │ (Thread)│ │
-│ └────┬────┘ └────┬────┘ └────┬────┘ │
-│      │            │           │      │
-│      └────────────┴───────────┘      │
-│         Gets tasks from queue        │
-└──────────────────────────────────────┘
++--------------------------------------+ 
+|         ThreadPool (Manager)         |
++--------------------------------------+
+|  Queue: [Task1] [Task2] [Task3] ... |
++--------------------------------------+
+| +---------+ +---------+ +---------+ |
+| | Worker1 | | Worker2 | | Worker3 | |
+| | (Thread)| | (Thread)| | (Thread)| |
+| +----+----+ +----+----+ +----+----+ |
+|      |            |           |      |
+|      +------------+-----------+      |
+|         Gets tasks from queue        |
++--------------------------------------+
 ```
 
 ## Key Components
@@ -54,19 +54,19 @@ The ThreadPool pattern manages a collection of reusable worker threads that exec
 
 ## Advantages
 
-✓ Reduces thread creation overhead
-✓ Reuses threads efficiently
-✓ Improves application responsiveness
-✓ Provides scalable task processing
-✓ Simplifies concurrent programming
+- Reduces thread creation overhead
+- Reuses threads efficiently
+- Improves application responsiveness
+- Provides scalable task processing
+- Simplifies concurrent programming
 
 ## Disadvantages
 
-✗ Fixed pool size may be suboptimal
-✗ Requires careful task design
-✗ Deadlock risk with dependent tasks
-✗ Thread contention if pool is small
-✗ Memory overhead for idle threads
+- Fixed pool size may be suboptimal
+- Requires careful task design
+- Deadlock risk with dependent tasks
+- Thread contention if pool is small
+- Memory overhead for idle threads
 
 ## Worker Thread Lifecycle
 

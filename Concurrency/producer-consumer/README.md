@@ -12,15 +12,15 @@ The Producer-Consumer pattern is a concurrency design pattern that coordinates w
 ## Structure
 
 ```text
-┌─────────────┐         ┌──────────┐         ┌─────────────┐
-│ Producer 1  │         │  Buffer  │         │ Consumer 1  │
-│ (Thread)    ├────────►│  (Queue) ├────────►│ (Thread)    │
-└─────────────┘         │ (Mutex)  │         └─────────────┘
-                        │ (CondVar)│
-┌─────────────┐         └──────────┘          ┌─────────────┐
-│ Producer 2  │              ▲                │ Consumer 2  │
-│ (Thread)    ├──────────────┤                │ (Thread)    │
-└─────────────┘              └────────────────└─────────────┘
++-------------+         +----------+         +-------------+
+| Producer 1  |         |  Buffer  |         | Consumer 1  |
+| (Thread)    |-------->|  (Queue) |-------->| (Thread)    |
+-------------+         | (Mutex)  |         +-------------+
+                        | (CondVar)|
++-------------+         +----------+         +-------------+
+| Producer 2  |              ^                | Consumer 2  |
+| (Thread)    |--------------|                | (Thread)    |
+-------------+                               +-------------+
 ```
 
 ## Key Components

@@ -15,25 +15,25 @@ The **Proxy Pattern** provides a surrogate or placeholder for another object to 
 ## Structure
 
 ```
-┌───────────────┐
-│   Client      │
-└───────────────┘
-        │
-        │ uses
-        ▼
-┌───────────────┐
-│    Image      │ (Subject)
-├───────────────┤
-│ + display()   │
-└───────────────┘
-       ▲
-       │
-   ┌───┴──────────┐
-   │              │
-┌──────────┐  ┌──────────────┐
-│ RealImage│  │ ProxyImage   │
-└──────────┘  └──────────────┘
-              (lazy loads)
+ +---------------+
+ |   Client      |
+ +---------------+
+   |
+   | uses
+   v
+ +---------------+
+ |    Image      | (Subject)
+ |---------------|
+ | + display()   |
+ +---------------+
+  ^
+  |
+    +---+---------+
+    |             |
+ +----------+  +--------------+
+ | RealImage|  | ProxyImage   |
+ +----------+  +--------------+
+         (lazy loads)
 ```
 
 ## Implementation Details
@@ -72,19 +72,19 @@ class ProxyImage : public Image {
 
 ## Advantages
 
-✓ Delays expensive initialization
-✓ Adds access control
-✓ Enables logging/monitoring
-✓ Hides network complexity
-✓ Improves performance
+- Delays expensive initialization
+- Adds access control
+- Enables logging/monitoring
+- Hides network complexity
+- Improves performance
 
 ## Disadvantages
 
-✗ Added complexity
-✗ Slightly slower access
-✗ Thread safety concerns
-✗ May complicate debugging
-✗ Indirection overhead
+- Added complexity
+- Slightly slower access
+- Thread safety concerns
+- May complicate debugging
+- Indirection overhead
 
 ## Related Patterns
 

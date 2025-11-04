@@ -13,13 +13,13 @@ The **Singleton Pattern** ensures that a class has only one instance and provide
 ## Structure
 
 ```
-┌─────────────┐
-│  Singleton  │
-├─────────────┤
-│ - instance  │
-├─────────────┤
-│ + getInstance() │
-└─────────────┘
+-----------------
+|  Singleton     |
+|----------------|
+| - instance     |
+|----------------|
+| + getInstance()|
+-----------------
 ```
 
 ## Implementation Details
@@ -53,18 +53,18 @@ static Logger& get_instance() noexcept {
 
 ## Advantages
 
-✓ Ensures single instance across application
-✓ Global access point to instance
-✓ Lazy initialization (instance created on first use)
-✓ Thread-safe in C++11 and later
-✓ Memory-efficient
+- Ensures single instance across application
+- Global access point to instance
+- Lazy initialization (instance created on first use)
+- Thread-safe in C++11 and later
+- Memory-efficient
 
 ## Disadvantages
 
-✗ Difficult to test (hides dependencies)
-✗ Makes unit testing more complex
-✗ Can mask design issues
-✗ Global state management
+- Difficult to test (hides dependencies)
+- Makes unit testing more complex
+- Can mask design issues
+- Global state management
 
 ## Related Patterns
 

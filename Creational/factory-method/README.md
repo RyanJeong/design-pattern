@@ -14,36 +14,36 @@ The **Factory Method Pattern** defines an interface for creating objects in a su
 ## Structure
 
 ```
-┌──────────────┐
-│  Document   │ (Abstract Product)
-├──────────────┤
-│ + open()     │
-│ + save()     │
-│ + close()    │
-└──────────────┘
-       ▲
-       │
-   ┌───┴───────┬─────────┐
-   │           │         │
-┌──────┐  ┌────────┐  ┌──────────┐
-│ PDF  │  │ Word   │  │ Text     │
-│ Doc  │  │ Doc    │  │ Doc      │
-└──────┘  └────────┘  └──────────┘
+----------------------
+|  Document           | (Abstract Product)
+|---------------------|
+| + open()            |
+| + save()            |
+| + close()           |
+---------------------+
+             ^
+             |
+     +---+------+ +---------+
+     |          | |         |
+ +------+ +--------+ +--------+
+ | PDF  | | Word   | | Text   |
+ | Doc  | | Doc    | | Doc    |
+ +------+ +--------+ +--------+
 
-┌──────────────────┐
-│ Application      │ (Abstract Creator)
-├──────────────────┤
-│ + create_document()│
-│ + new_document() │
-└──────────────────┘
-       ▲
-       │
-   ┌───┴───────┬──────────┐
-   │           │          │
-┌─────────┐ ┌────────┐ ┌──────────┐
-│ PDF     │ │ Word   │ │ Text     │
-│ App     │ │ App    │ │ App      │
-└─────────┘ └────────┘ └──────────┘
+------------------------
+| Application          | (Abstract Creator)
+|----------------------|
+| + create_document()  |
+| + new_document()     |
+----------------------+
+             ^
+             |
+     +---+-----+ +--------+ +--------+
+     |         | |        | |        |
+ +--------+ +--------+ +--------+
+ | PDF    | | Word   | | Text   |
+ | App    | | App    | | App    |
+ +--------+ +--------+ +--------+
 ```
 
 ## Implementation Details
@@ -71,18 +71,18 @@ virtual std::unique_ptr<Document> create_document() const noexcept = 0;
 
 ## Advantages
 
-✓ Loose coupling between creator and product
-✓ Follows Open/Closed Principle
-✓ Centralized object creation
-✓ Easy to add new product types
-✓ Flexibility in product selection
+- Loose coupling between creator and product
+- Follows Open/Closed Principle
+- Centralized object creation
+- Easy to add new product types
+- Flexibility in product selection
 
 ## Disadvantages
 
-✗ Additional classes needed
-✗ Code complexity increased
-✗ Overkill for simple objects
-✗ May create unnecessary abstraction
+- Additional classes needed
+- Code complexity increased
+- Overkill for simple objects
+- May create unnecessary abstraction
 
 ## Related Patterns
 

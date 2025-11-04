@@ -14,33 +14,33 @@ The **Bridge Pattern** decouples an object's abstraction from its implementation
 ## Structure
 
 ```
-┌─────────────────┐
-│     Shape       │ (Abstraction)
-├─────────────────┤
-│ - renderer      │
-└─────────────────┘
-       ▲
-       │
-   ┌───┴──────┐
-   │          │
-┌────────┐ ┌──────────┐
-│ Circle │ │Rectangle │ (Refined Abstractions)
-└────────┘ └──────────┘
++-----------------+
+|     Shape       | (Abstraction)
+|-----------------|
+| - renderer      |
++-----------------+
+       ^
+       |
+   +---+----+
+   |        |
+ +--------+ +----------+
+ | Circle | |Rectangle | (Refined Abstractions)
+ +--------+ +----------+
 
-┌──────────────────┐
-│   Renderer       │ (Implementer)
-├──────────────────┤
-│ + render_circle()│
-│ + render_rect()  │
-└──────────────────┘
-       ▲
-       │
-   ┌───┴──────┐
-   │          │
-┌────────────┐ ┌──────────────┐
-│ Vector     │ │ Raster       │
-│ Renderer   │ │ Renderer     │
-└────────────┘ └──────────────┘
+ +------------------+
+ |   Renderer       | (Implementer)
+ |------------------|
+ | + render_circle()|
+ | + render_rect()  |
+ +------------------+
+       ^
+       |
+   +---+----+
+   |        |
+ +------------+ +--------------+
+ | Vector     | | Raster       |
+ | Renderer   | | Renderer     |
+ +------------+ +--------------+
 ```
 
 ## Implementation Details
@@ -76,18 +76,18 @@ circle.draw();  // Uses raster implementation
 
 ## Advantages
 
-✓ Decouples abstraction from implementation
-✓ Both can vary independently
-✓ Reduces class proliferation
-✓ Implementation can be selected at runtime
-✓ Improves extensibility
+- Decouples abstraction from implementation
+- Both can vary independently
+- Reduces class proliferation
+- Implementation can be selected at runtime
+- Improves extensibility
 
 ## Disadvantages
 
-✗ Increases complexity
-✗ Adds extra abstraction level
-✗ Performance overhead from indirection
-✗ Not needed for simple cases
+- Increases complexity
+- Adds extra abstraction level
+- Performance overhead from indirection
+- Not needed for simple cases
 
 ## Related Patterns
 
