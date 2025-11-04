@@ -244,6 +244,63 @@ class Person {
 
 ---
 
+## C++ Function Parameters: Move vs. Const-Reference
+
+### 1. Pass-by-Value (with `std::move`)
+
+This pattern **transfers ownership** of the object to the function.
+
+```cpp
+// The Call
+Foo foo;
+Func(std::move(foo)); 
+// foo is now in an "empty" or "moved-from" state
+
+// The Function
+void Func(Foo foo) {
+  // The parameter 'foo' is a *new* object
+  // It was move-constructed from the original 'foo'
+}
+```
+
+- **Cost:** **1 Move Operation**. This is cheap (no deep copy) but is *not* free. It involves internal pointer swapping.
+- **Effect on Original:** The original `foo` is gutted. Its resources have been stolen. It should not be used again unless reset.
+- **Intent:** Use this when you want the function to **take ownership** or "consume" the object.
+
+### 2. Pass-by-Const-Reference
+
+This pattern **borrows** the object for read-only access. This is the most common and efficient way to pass objects you only need to read.
+
+```cpp
+// The Call
+Foo foo;
+Func(foo);
+// foo is completely unchanged after the call
+
+// The Function
+void Func(const Foo& foo) {
+  // The parameter 'foo' is a *reference* (an alias)
+  // to the original 'foo'. No new object is created.
+}
+```
+
+- **Cost:** **1 Reference Binding**. This is virtually **zero cost** (just passing an address/pointer).
+- **Effect on Original:** The original `foo` is **guaranteed to be unchanged**.
+- **Intent:** Use this when you want the function to **observe** or **read** the object without modifying it or taking ownership.
+
+### Summary
+
+| Feature | `Func(Foo foo)` + `std::move` | `Func(const Foo& foo)` |
+| :--- | :--- | :--- |
+| **Action** | **Transfers Ownership** | **Borrows (Read-Only)** |
+| **New Object Created?** | **Yes** (via Move) | **No** (Uses original) |
+| **Cost** | 1 Move Operation (Cheap) | \~Zero Cost (Cheapest) |
+| **Original `foo` State**| **Empty** (Moved-from) | **Unchanged** |
+
+**Conclusion:** `const Foo&` is faster and should be your default choice for passing objects that you only need to read. Use the `std::move` pattern only when you explicitly intend for the function to take ownership of the original object's resources.
+
+---
+
 ## C++ Constructor Patterns: `const&` vs. `by-value`
 
 ### 1. Pass-by-Const-Reference
