@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
 /**
  * @brief Component - interface for objects that can have responsibilities added
@@ -25,7 +26,7 @@ class Component {
    * @side_effects None
    * @throws None (noexcept)
    */
-  virtual std::string get_description() const noexcept = 0;
+  virtual std::string GetDescription() const noexcept = 0;
 
   /**
    * @brief Gets cost
@@ -33,7 +34,7 @@ class Component {
    * @side_effects None
    * @throws None (noexcept)
    */
-  virtual double get_cost() const noexcept = 0;
+  virtual double GetCost() const noexcept = 0;
 };
 
 /**
@@ -43,11 +44,11 @@ class Component {
  */
 class SimpleCoffee : public Component {
  public:
-  std::string get_description() const noexcept override {
+  std::string GetDescription() const noexcept override {
     return "Simple Coffee";
   }
 
-  double get_cost() const noexcept override { return 2.0; }
+  double GetCost() const noexcept override { return 2.0; }
 };
 
 /**
@@ -63,11 +64,11 @@ class CoffeeDecorator : public Component {
   explicit CoffeeDecorator(std::unique_ptr<Component> component) noexcept
       : component_(std::move(component)) {}
 
-  std::string get_description() const noexcept override {
-    return component_->get_description();
+  std::string GetDescription() const noexcept override {
+    return component_->GetDescription();
   }
 
-  double get_cost() const noexcept override { return component_->get_cost(); }
+  double GetCost() const noexcept override { return component_->GetCost(); }
 };
 
 /**
@@ -80,12 +81,12 @@ class MilkDecorator : public CoffeeDecorator {
   explicit MilkDecorator(std::unique_ptr<Component> component) noexcept
       : CoffeeDecorator(std::move(component)) {}
 
-  std::string get_description() const noexcept override {
-    return component_->get_description() + ", Milk";
+  std::string GetDescription() const noexcept override {
+    return component_->GetDescription() + ", Milk";
   }
 
-  double get_cost() const noexcept override {
-    return component_->get_cost() + 0.5;
+  double GetCost() const noexcept override {
+    return component_->GetCost() + 0.5;
   }
 };
 
@@ -99,12 +100,12 @@ class SugarDecorator : public CoffeeDecorator {
   explicit SugarDecorator(std::unique_ptr<Component> component) noexcept
       : CoffeeDecorator(std::move(component)) {}
 
-  std::string get_description() const noexcept override {
-    return component_->get_description() + ", Sugar";
+  std::string GetDescription() const noexcept override {
+    return component_->GetDescription() + ", Sugar";
   }
 
-  double get_cost() const noexcept override {
-    return component_->get_cost() + 0.25;
+  double GetCost() const noexcept override {
+    return component_->GetCost() + 0.25;
   }
 };
 
@@ -118,12 +119,12 @@ class ChocolateDecorator : public CoffeeDecorator {
   explicit ChocolateDecorator(std::unique_ptr<Component> component) noexcept
       : CoffeeDecorator(std::move(component)) {}
 
-  std::string get_description() const noexcept override {
-    return component_->get_description() + ", Chocolate";
+  std::string GetDescription() const noexcept override {
+    return component_->GetDescription() + ", Chocolate";
   }
 
-  double get_cost() const noexcept override {
-    return component_->get_cost() + 0.75;
+  double GetCost() const noexcept override {
+    return component_->GetCost() + 0.75;
   }
 };
 

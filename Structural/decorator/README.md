@@ -13,29 +13,29 @@ The **Decorator Pattern** attaches additional responsibilities to an object dyna
 
 ## Structure
 
-```
+```text
 +--------------+
 |  Component   | (Base Interface)
 |--------------|
-| + operation()|
+| + Operation()|
 +--------------+
      ^
      |
    +---+----------+
    |              |
- +--------+  +--------------+
- | Simple |  |  Decorator   |
- |Component|  |--------------|
- +--------+  | - component  |
-       | + operation()|
-       +--------------+
-          ^
-          |
-         +----+----+----+--------+
-         |         |    |        |
-       +--------+ +------+ +---------+ +-------+
-       | Milk   | | Sugar| |Chocolate| | ...   |
-       +--------+ +------+ +---------+ +-------+
+ +---------+ +--------------+
+ | Simple  | |  Decorator   |
+ |Component| |--------------|
+ +---------+ | - component  |
+             | + Operation()|
+             +--------------+
+                ^
+                |
+               +----+----+--------+-----------+
+               |         |        |           |
+             +--------+ +------+ +---------+ +-------+
+             | Milk   | | Sugar| |Chocolate| | ...   |
+             +--------+ +------+ +---------+ +-------+
 ```
 
 ## Implementation Details
@@ -46,8 +46,8 @@ The **Decorator Pattern** attaches additional responsibilities to an object dyna
 class CoffeeDecorator : public Component {
   std::unique_ptr<Component> component_;
   
-  virtual std::string get_description() {
-    return component_->get_description() + ", Extra";
+  virtual std::string GetDescription() {
+    return component_->GetDescription() + ", Extra";
   }
 };
 ```
@@ -92,26 +92,6 @@ auto coffee = std::make_unique<ChocolateDecorator>(
 - **Composite**: Tree of decorators
 - **Proxy**: Controls access
 
-## Compilation & Execution
-
-```bash
-mkdir -p build
-cd build
-cmake ..
-make
-./Decorator
-```
-
-## Expected Output
-
-```
-=== Coffee Ordering ===
-Simple Coffee - $2
-Simple Coffee, Milk - $2.5
-Simple Coffee, Milk, Sugar - $2.75
-Simple Coffee, Milk, Sugar, Chocolate - $3.5
-```
-
 ## Key Classes
 
 - **Component**: Component interface
@@ -124,8 +104,8 @@ Simple Coffee, Milk, Sugar, Chocolate - $3.5
 ```cpp
 auto coffee = std::make_unique<MilkDecorator>(
     std::make_unique<SimpleCoffee>());
-std::cout << coffee->get_description() << " - $"
-          << coffee->get_cost() << std::endl;
+std::cout << coffee->GetDescription() << " - $"
+          << coffee->GetCost() << std::endl;
 ```
 
 ## Notes
