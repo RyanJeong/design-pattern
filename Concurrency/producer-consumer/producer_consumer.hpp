@@ -3,7 +3,8 @@
 // Description: Producer-Consumer concurrency pattern implementation
 // Copyright 2025
 
-#pragma once
+#ifndef CONCURRENCY_PRODUCER_CONSUMER_PRODUCER_CONSUMER_HPP_
+#define CONCURRENCY_PRODUCER_CONSUMER_PRODUCER_CONSUMER_HPP_
 
 #include <chrono>
 #include <condition_variable>
@@ -11,7 +12,9 @@
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 /**
@@ -23,7 +26,11 @@ struct Item {
   int id;
   std::string data;
 
-  Item(int id, const std::string& data) noexcept : id(id), data(data) {}
+  // Accept data by value to enable move-semantics at the call-site.
+  // When callers pass temporaries or std::move'd strings, this avoids an
+  // extra copy by moving into the member.
+  Item(int id_val, std::string data_val) noexcept
+      : id(id_val), data(std::move(data_val)) {}
 };
 
 /**
@@ -51,17 +58,31 @@ class Buffer {
   /**
    * @brief Produces (adds) item to buffer
    * @param item Item to produce
-   * @side_effects Adds item to queue, notifies consumers
+   * @side_effects Adds item to queue and prints production info
+   * @side_effects_reason Demonstration requirement: Producer-Consumer pattern
+   *   synchronizes multiple concurrent threads. Console output makes task
+   *   ordering and buffer state visible across thread boundaries
+   * @side_effects_what Writes to stdout for thread synchronization visibility
+   * @side_effects_impact Console I/O adds minimal overhead (once per produced
+   * item)
+   * @side_effects_alternatives External monitoring; adds complexity
    * @throws None (noexcept)
    */
-  void Produce(const Item& item) noexcept {
+  // Take the item by value and move into the queue. This allows callers to
+  // either pass a temporary (no copy) or std::move an existing item which
+  // avoids one extra copy compared with taking a const& and pushing.
+  void Produce(Item item) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
 
     // Wait if buffer is full
     not_full_.wait(lock, [this]() { return queue_.size() < max_size_; });
 
-    queue_.push(item);
-    std::cout << "[Producer] Produced: " << item.data << " (ID: " << item.id
+    // Store data needed for logging before moving the item (move leaves
+    // the moved-from object in a valid-but-unspecified state).
+    std::string log_data = item.data;
+    int log_id = item.id;
+    queue_.push(std::move(item));
+    std::cout << "[Producer] Produced: " << log_data << " (ID: " << log_id
               << "), Queue size: " << queue_.size() << std::endl;
 
     not_empty_.notify_one();
@@ -70,7 +91,8 @@ class Buffer {
   /**
    * @brief Consumes (removes) item from buffer
    * @return Consumed item
-   * @side_effects Removes item from queue, notifies producers
+   * @side_effects Removes item from queue and prints consumption info
+   * @side_effects_reason Demonstration requirement (see Produce() rationale)
    * @throws None (noexcept)
    */
   Item Consume() noexcept {
@@ -136,7 +158,7 @@ class Producer {
   // call-site simple (pass by value) while ensuring only one copy of the
   // owning handle is retained by the `Producer` instance.
   Producer(std::shared_ptr<Buffer> buffer, int id, int item_count) noexcept
-    : buffer_(std::move(buffer)), id_(id), item_count_(item_count) {}
+      : buffer_(std::move(buffer)), id_(id), item_count_(item_count) {}
 
   /**
    * @brief Runs producer thread
@@ -150,7 +172,8 @@ class Producer {
       std::string data =
           "Item_P" + std::to_string(id_) + "_" + std::to_string(i);
       Item item(id_ * 100 + i, data);
-      buffer_->Produce(item);
+      // Move the item into Produce to avoid an extra copy.
+      buffer_->Produce(std::move(item));
 
       // Simulate production delay.
       // We choose a relatively short delay (100 ms) for the producer to
@@ -190,7 +213,7 @@ class Consumer {
   // captures the shared_ptr will have already made one copy; moving the
   // parameter into the member avoids a second copy at this point.
   Consumer(std::shared_ptr<Buffer> buffer, int id, int item_count) noexcept
-    : buffer_(std::move(buffer)), id_(id), item_count_(item_count) {}
+      : buffer_(std::move(buffer)), id_(id), item_count_(item_count) {}
 
   /**
    * @brief Runs consumer thread
@@ -199,7 +222,8 @@ class Consumer {
    */
   void Run() noexcept {
     for (int i = 0; i < item_count_; ++i) {
-      std::cout << "[Consumer " << id_ << "] Attempting to consume item..." << std::endl;
+      std::cout << "[Consumer " << id_ << "] Attempting to consume item..."
+                << std::endl;
 
       Item item = buffer_->Consume();
 
@@ -215,3 +239,4 @@ class Consumer {
     }
   }
 };
+#endif  // CONCURRENCY_PRODUCER_CONSUMER_PRODUCER_CONSUMER_HPP_

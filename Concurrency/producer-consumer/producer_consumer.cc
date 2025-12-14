@@ -3,7 +3,12 @@
 // Description: Producer-Consumer pattern demonstration
 // Copyright 2025
 
-#include "producer_consumer.hpp"
+#include "producer_consumer.hpp"  // [NOLINT]
+
+#include <iostream>
+#include <memory>
+#include <thread>
+#include <vector>
 
 int main() {
   std::cout << "============================================\n"
@@ -36,7 +41,7 @@ int main() {
 
   // Wait for all threads to complete
   for (auto& thread : threads)
-    if (thread.joinable()) { thread.join(); }
+    if (thread.joinable()) thread.join();
 
   std::cout << "\n============================================\n"
             << "Demonstration complete\n"

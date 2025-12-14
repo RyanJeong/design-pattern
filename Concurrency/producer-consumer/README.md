@@ -82,3 +82,11 @@ The Producer-Consumer pattern is a concurrency design pattern that coordinates w
 - Take-by-value + move: Producer/Consumer constructors accept the buffer as a
   `std::shared_ptr<Buffer>` by value and move it into the member (e.g. `buffer_(std::move(buffer))`)
   - Benefit: avoids one transient `shared_ptr` copy at construction (fewer atomic refcount ops) and clarifies ownership intent while preserving shared ownership semantics
+
+- Move semantics for items: This implementation was updated to use move semantics
+  for produced items. The `Item` constructor accepts the payload by-value and
+  moves it into the member, and `Buffer::Produce` takes `Item` by-value and
+  moves it into the queue (i.e. `queue_.push(std::move(item))`).
+  - Benefit: callers can pass temporaries or std::move existing items to avoid
+    extra copies; logging reads needed fields before the move to avoid using
+    moved-from objects.
