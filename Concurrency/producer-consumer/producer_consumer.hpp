@@ -239,4 +239,5 @@ class Consumer {
     }
   }
 };
+
 #endif  // CONCURRENCY_PRODUCER_CONSUMER_PRODUCER_CONSUMER_HPP_
