@@ -13,7 +13,7 @@ The **Bridge Pattern** decouples an object's abstraction from its implementation
 
 ## Structure
 
-```
+```text
 +-----------------+
 |     Shape       | (Abstraction)
 |-----------------|
@@ -30,8 +30,8 @@ The **Bridge Pattern** decouples an object's abstraction from its implementation
  +------------------+
  |   Renderer       | (Implementer)
  |------------------|
- | + render_circle()|
- | + render_rect()  |
+ | + RenderCircle() |
+ | + RenderRect()   |
  +------------------+
        ^
        |
@@ -51,8 +51,8 @@ The **Bridge Pattern** decouples an object's abstraction from its implementation
 class Shape {
   std::shared_ptr<Renderer> renderer_;
   
-  virtual void draw() {
-    renderer_->render_circle(x, y, r);
+  virtual void Draw() {
+    renderer_->RenderCircle(x, y, r);
   }
 };
 ```
@@ -62,8 +62,8 @@ class Shape {
 Both abstraction and implementation can change:
 
 ```cpp
-circle.set_renderer(new RasterRenderer());
-circle.draw();  // Uses raster implementation
+circle.SetRenderer(new RasterRenderer());
+circle.Draw();  // Uses raster implementation
 ```
 
 ## Use Cases
@@ -96,49 +96,12 @@ circle.draw();  // Uses raster implementation
 - **Strategy**: Different approach to flexibility
 - **Decorator**: Different structural purpose
 
-## Compilation & Execution
-
-```bash
-mkdir -p build
-cd build
-cmake ..
-make
-./Bridge
-```
-
-## Expected Output
-
-```
-=== Vector Renderer ===
-Rendering circle in vector: center(10,20), radius=5
-Rendering rectangle in vector: pos(0,0), size=100x50
-
-=== Raster Renderer ===
-Rendering circle in raster: center(30,40), radius=8
-Rendering rectangle in raster: pos(10,10), size=200x150
-
-=== Runtime Renderer Switch ===
-Rendering circle in vector: center(50,60), radius=3
-Rendering circle in raster: center(50,60), radius=3
-```
-
 ## Key Classes
 
 - **Shape**: Abstraction base class
 - **Circle, Rectangle**: Refined abstractions
 - **Renderer**: Implementer interface
 - **VectorRenderer, RasterRenderer**: Concrete implementers
-
-## Example Usage
-
-```cpp
-auto vector_renderer = std::make_shared<VectorRenderer>();
-Circle circle(vector_renderer, 10, 20, 5);
-circle.draw();
-
-circle.set_renderer(std::make_shared<RasterRenderer>());
-circle.draw();  // Different implementation
-```
 
 ## Notes
 

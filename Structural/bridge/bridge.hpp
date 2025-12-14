@@ -24,10 +24,16 @@ class Renderer {
    * @param x X coordinate
    * @param y Y coordinate
    * @param radius Circle radius
-   * @side_effects Prints to console
+   * @side_effects Prints to console for demo feedback
+   * @side_effects_reason Demonstration requirement: Bridge pattern separates
+   *   abstraction from implementation. Console output shows which renderer
+   *   implementation is being used for each shape
+   * @side_effects_what Writes to stdout for renderer selection visibility
+   * @side_effects_impact Console I/O adds minimal overhead (per render)
+   * @side_effects_alternatives Inject logger; adds complexity for demo
    * @throws None (noexcept)
    */
-  virtual void render_circle(int x, int y, int radius) const noexcept = 0;
+  virtual void RenderCircle(int x, int y, int radius) const noexcept = 0;
 
   /**
    * @brief Renders a rectangle
@@ -35,11 +41,11 @@ class Renderer {
    * @param y Y coordinate
    * @param width Rectangle width
    * @param height Rectangle height
-   * @side_effects Prints to console
+   * @side_effects Prints to console (see RenderCircle rationale)
    * @throws None (noexcept)
    */
-  virtual void render_rectangle(int x, int y, int width,
-                                int height) const noexcept = 0;
+  virtual void RenderRectangle(int x, int y, int width,
+                               int height) const noexcept = 0;
 };
 
 /**
@@ -49,13 +55,13 @@ class Renderer {
  */
 class VectorRenderer : public Renderer {
  public:
-  void render_circle(int x, int y, int radius) const noexcept override {
+  void RenderCircle(int x, int y, int radius) const noexcept override {
     std::cout << "Rendering circle in vector: center(" << x << "," << y
               << "), radius=" << radius << std::endl;
   }
 
-  void render_rectangle(int x, int y, int width,
-                        int height) const noexcept override {
+  void RenderRectangle(int x, int y, int width,
+                       int height) const noexcept override {
     std::cout << "Rendering rectangle in vector: pos(" << x << "," << y
               << "), size=" << width << "x" << height << std::endl;
   }
@@ -68,13 +74,13 @@ class VectorRenderer : public Renderer {
  */
 class RasterRenderer : public Renderer {
  public:
-  void render_circle(int x, int y, int radius) const noexcept override {
+  void RenderCircle(int x, int y, int radius) const noexcept override {
     std::cout << "Rendering circle in raster: center(" << x << "," << y
               << "), radius=" << radius << std::endl;
   }
 
-  void render_rectangle(int x, int y, int width,
-                        int height) const noexcept override {
+  void RenderRectangle(int x, int y, int width,
+                       int height) const noexcept override {
     std::cout << "Rendering rectangle in raster: pos(" << x << "," << y
               << "), size=" << width << "x" << height << std::endl;
   }
@@ -100,7 +106,7 @@ class Shape {
    * @side_effects Delegates to renderer
    * @throws None (noexcept)
    */
-  virtual void draw() const noexcept = 0;
+  virtual void Draw() const noexcept = 0;
 
   /**
    * @brief Changes renderer
@@ -108,7 +114,7 @@ class Shape {
    * @side_effects Updates renderer
    * @throws None (noexcept)
    */
-  void set_renderer(std::shared_ptr<Renderer> renderer) noexcept {
+  void SetRenderer(std::shared_ptr<Renderer> renderer) noexcept {
     renderer_ = renderer;
   }
 };
@@ -128,8 +134,8 @@ class Circle : public Shape {
   Circle(std::shared_ptr<Renderer> renderer, int x, int y, int radius) noexcept
       : Shape(renderer), x_(x), y_(y), radius_(radius) {}
 
-  void draw() const noexcept override {
-    renderer_->render_circle(x_, y_, radius_);
+  void Draw() const noexcept override {
+    renderer_->RenderCircle(x_, y_, radius_);
   }
 };
 
@@ -150,8 +156,8 @@ class Rectangle : public Shape {
             int height) noexcept
       : Shape(renderer), x_(x), y_(y), width_(width), height_(height) {}
 
-  void draw() const noexcept override {
-    renderer_->render_rectangle(x_, y_, width_, height_);
+  void Draw() const noexcept override {
+    renderer_->RenderRectangle(x_, y_, width_, height_);
   }
 };
 
