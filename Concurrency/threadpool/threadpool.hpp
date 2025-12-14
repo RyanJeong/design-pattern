@@ -15,6 +15,7 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <utility>
 #include <vector>
 
 /**
@@ -43,7 +44,7 @@ class ThreadPool {
       condition_.wait(lock, [this]() { return !tasks_.empty() || stop_; });
 
       // Exit if stopped and no tasks remaining
-      if (stop_ && tasks_.empty()) { break; }
+      if (stop_ && tasks_.empty()) break;
 
       // Get and execute task
       if (!tasks_.empty()) {
@@ -64,9 +65,9 @@ class ThreadPool {
    * @throws None (noexcept)
    */
   explicit ThreadPool(size_t num_threads) noexcept : stop_(false) {
-    for (size_t i = 0; i < num_threads; ++i) {
+    for (size_t i = 0; i < num_threads; ++i)
       workers_.emplace_back([this]() { WorkerLoop(); });
-    }
+
     std::cout << "ThreadPool created with " << num_threads << " workers\n";
   }
 
@@ -82,9 +83,8 @@ class ThreadPool {
     }
     condition_.notify_all();
 
-    for (std::thread& worker : workers_) {
-      if (worker.joinable()) { worker.join(); }
-    }
+    for (std::thread& worker : workers_)
+      if (worker.joinable()) worker.join();
   }
 
   /**
@@ -169,4 +169,4 @@ class Task {
   }
 };
 
-#endif  // THREADPOOL_HPP_
+#endif  // CONCURRENCY_THREADPOOL_THREADPOOL_HPP_

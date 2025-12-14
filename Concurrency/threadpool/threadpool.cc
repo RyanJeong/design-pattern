@@ -3,7 +3,9 @@
 // Description: ThreadPool pattern demonstration
 // Copyright 2025
 
-#include "threadpool.hpp"
+#include "threadpool.hpp"  // [NOLINT]
+
+#include <iostream>
 
 int main() {
   std::cout << "============================================\n"
@@ -28,9 +30,8 @@ int main() {
     std::cout << "Waiting for all tasks to complete...\n\n";
 
     // Wait for all tasks to complete
-    while (pool.pending_tasks() > 0) {
+    while (pool.pending_tasks() > 0)
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
 
     // Give threads time to process remaining tasks
     std::this_thread::sleep_for(std::chrono::seconds(1));
