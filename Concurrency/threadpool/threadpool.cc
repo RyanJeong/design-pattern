@@ -19,7 +19,7 @@ int main() {
     // Enqueue tasks
     for (int i = 1; i <= 12; ++i) {
       Task task(i);
-      pool.enqueue([task]() { task.execute(); });
+      pool.Enqueue([task]() { task.Execute(); });
     }
 
     std::cout << "\nPending tasks: " << pool.pending_tasks() << "\n";

@@ -35,7 +35,7 @@ class ThreadPool {
    * @side_effects Executes tasks from queue
    * @throws None (noexcept)
    */
-  void worker_loop() noexcept {
+  void WorkerLoop() noexcept {
     while (true) {
       std::unique_lock<std::mutex> lock(mutex_);
 
@@ -65,7 +65,7 @@ class ThreadPool {
    */
   explicit ThreadPool(size_t num_threads) noexcept : stop_(false) {
     for (size_t i = 0; i < num_threads; ++i) {
-      workers_.emplace_back([this]() { worker_loop(); });
+      workers_.emplace_back([this]() { WorkerLoop(); });
     }
     std::cout << "ThreadPool created with " << num_threads << " workers\n";
   }
@@ -94,7 +94,7 @@ class ThreadPool {
    * @throws None (noexcept)
    */
   template <typename F>
-  void enqueue(F function) noexcept {
+  void Enqueue(F function) noexcept {
     {
       std::unique_lock<std::mutex> lock(mutex_);
 
@@ -131,7 +131,7 @@ class ThreadPool {
 /**
  * @brief Simulated task for demonstration
  * @note Represents work to be done by thread pool
- * @side_effects Prints to console
+ * @side_effects Prints to console for demo feedback
  */
 class Task {
  private:
@@ -148,10 +148,17 @@ class Task {
 
   /**
    * @brief Executes task
-   * @side_effects Prints execution info and sleeps
+   * @side_effects Prints execution info, sleeps for simulation, and prints
+   * completion
+   * @side_effects_reason Demonstration requirement: ThreadPool pattern
+   *   manages concurrent task execution. Console output shows task
+   *   scheduling and execution across threads without external monitoring
+   * @side_effects_what Writes to stdout for task execution visibility
+   * @side_effects_impact Console I/O adds minor overhead per task
+   * @side_effects_alternatives External monitoring service; adds complexity
    * @throws None (noexcept)
    */
-  void execute() const noexcept {
+  void Execute() const noexcept {
     std::cout << "[Task " << id_ << "] Started on thread "
               << std::this_thread::get_id() << "\n";
 
@@ -162,4 +169,4 @@ class Task {
   }
 };
 
-#endif  // CONCURRENCY_THREADPOOL_THREADPOOL_HPP_
+#endif  // THREADPOOL_HPP_
