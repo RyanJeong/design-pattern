@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
 /**
  * @brief Target interface - expected by client
@@ -25,7 +26,7 @@ class MediaPlayer {
    * @side_effects Prints to console
    * @throws None (noexcept)
    */
-  virtual void play(const std::string& filename) const noexcept = 0;
+  virtual void Play(const std::string& filename) const noexcept = 0;
 };
 
 /**
@@ -43,7 +44,7 @@ class AdvancedMediaPlayer {
    * @side_effects Prints to console
    * @throws None (noexcept)
    */
-  virtual void play_vlc(const std::string& filename) const noexcept = 0;
+  virtual void PlayVlc(const std::string& filename) const noexcept = 0;
 
   /**
    * @brief Plays MKV format
@@ -51,7 +52,7 @@ class AdvancedMediaPlayer {
    * @side_effects Prints to console
    * @throws None (noexcept)
    */
-  virtual void play_mkv(const std::string& filename) const noexcept = 0;
+  virtual void PlayMkv(const std::string& filename) const noexcept = 0;
 };
 
 /**
@@ -61,11 +62,11 @@ class AdvancedMediaPlayer {
  */
 class VlcPlayer : public AdvancedMediaPlayer {
  public:
-  void play_vlc(const std::string& filename) const noexcept override {
+  void PlayVlc(const std::string& filename) const noexcept override {
     std::cout << "Playing VLC file: " << filename << std::endl;
   }
 
-  void play_mkv(const std::string&) const noexcept override {
+  void PlayMkv(const std::string&) const noexcept override {
     std::cout << "Cannot play MKV in VLC" << std::endl;
   }
 };
@@ -77,11 +78,11 @@ class VlcPlayer : public AdvancedMediaPlayer {
  */
 class MkvPlayer : public AdvancedMediaPlayer {
  public:
-  void play_vlc(const std::string&) const noexcept override {
+  void PlayVlc(const std::string&) const noexcept override {
     std::cout << "Cannot play VLC in MKV player" << std::endl;
   }
 
-  void play_mkv(const std::string& filename) const noexcept override {
+  void PlayMkv(const std::string& filename) const noexcept override {
     std::cout << "Playing MKV file: " << filename << std::endl;
   }
 };
@@ -97,21 +98,21 @@ class MediaAdapter : public MediaPlayer {
   std::string file_type_;
 
  public:
-  explicit MediaAdapter(const std::string& file_type) noexcept
-      : file_type_(file_type) {
-    if (file_type == "vlc") {
+  // Accept file_type by-value and move into member. Use member for decisions
+  // to avoid relying on a moved-from parameter.
+  explicit MediaAdapter(std::string file_type) noexcept
+      : file_type_(std::move(file_type)) {
+    if (file_type_ == "vlc")
       player_ = std::make_unique<VlcPlayer>();
-    } else if (file_type == "mkv") {
+    else if (file_type_ == "mkv")
       player_ = std::make_unique<MkvPlayer>();
-    }
   }
 
-  void play(const std::string& filename) const noexcept override {
-    if (file_type_ == "vlc") {
-      player_->play_vlc(filename);
-    } else if (file_type_ == "mkv") {
-      player_->play_mkv(filename);
-    }
+  void Play(const std::string& filename) const noexcept override {
+    if (file_type_ == "vlc")
+      player_->PlayVlc(filename);
+    else if (file_type_ == "mkv")
+      player_->PlayMkv(filename);
   }
 };
 
@@ -122,7 +123,7 @@ class MediaAdapter : public MediaPlayer {
  */
 class AudioPlayer : public MediaPlayer {
  public:
-  void play(const std::string& filename) const noexcept override {
+  void Play(const std::string& filename) const noexcept override {
     std::cout << "Playing audio file: " << filename << std::endl;
   }
 };

@@ -13,7 +13,7 @@ The **Adapter Pattern** makes incompatible interfaces work together by providing
 
 ## Structure
 
-```
+```text
 +-----------------+
 |  MediaPlayer    | (Target)
 +-----------------+
@@ -48,9 +48,9 @@ The **Adapter Pattern** makes incompatible interfaces work together by providing
 class MediaAdapter : public MediaPlayer {
   std::unique_ptr<AdvancedMediaPlayer> player_;
   
-  void play(const std::string& filename) override {
+  void Play(const std::string& filename) override {
     // Convert call to adaptee interface
-    player_->play_vlc(filename);
+    player_->PlayVlc(filename);
   }
 };
 ```
@@ -85,25 +85,6 @@ class MediaAdapter : public MediaPlayer {
 - **Facade**: Simplifies complex systems
 - **Proxy**: Controls access
 
-## Compilation & Execution
-
-```bash
-mkdir -p build
-cd build
-cmake ..
-make
-./Adapter
-```
-
-## Expected Output
-
-```
-=== Media Player with Adapter ===
-Playing audio file: song.mp3
-Playing VLC file: movie.vlc
-Playing MKV file: video.mkv
-```
-
 ## Key Classes
 
 - **MediaPlayer**: Target interface
@@ -112,19 +93,13 @@ Playing MKV file: video.mkv
 - **MediaAdapter**: Adapter class
 - **AudioPlayer**: Concrete target
 
-## Example Usage
-
-```cpp
-MediaAdapter vlc_adapter("vlc");
-vlc_adapter.play("movie.vlc");
-
-MediaAdapter mkv_adapter("mkv");
-mkv_adapter.play("video.mkv");
-```
-
 ## Notes
 
 - Class Adapter (inheritance) vs Object Adapter (composition)
 - This implementation uses Object Adapter (composition)
 - Good for integrating incompatible systems
 - Alternative to modifying interfaces
+
+## C++14 Features
+
+- Move semantics: `MediaAdapter` constructor accepts the file type by-value and moves it into the member (`MediaAdapter(std::string file_type) : file_type_(std::move(file_type)) { ... }`). This reduces copies when callers pass temporaries or `std::move`d strings.
