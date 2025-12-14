@@ -14,7 +14,7 @@ The **Proxy Pattern** provides a surrogate or placeholder for another object to 
 
 ## Structure
 
-```
+```text
  +---------------+
  |   Client      |
  +---------------+
@@ -24,12 +24,12 @@ The **Proxy Pattern** provides a surrogate or placeholder for another object to 
  +---------------+
  |    Image      | (Subject)
  |---------------|
- | + display()   |
+ | + Display()   |
  +---------------+
-  ^
-  |
-    +---+---------+
-    |             |
+   ^
+   |
+   +-------------+
+   |             |
  +----------+  +--------------+
  | RealImage|  | ProxyImage   |
  +----------+  +--------------+
@@ -42,12 +42,12 @@ The **Proxy Pattern** provides a surrogate or placeholder for another object to 
 
 ```cpp
 class ProxyImage : public Image {
-  mutable std::unique_ptr<RealImage> real;
+  mutable std::unique_ptr<RealImage> real_;
   
-  void display() {
-    if (!real)
-      real = std::make_unique<RealImage>(filename);
-    real->display();
+  void Display() {
+    if (!real_)
+      real_ = std::make_unique<RealImage>(filename_);
+    real->Display();
   }
 };
 ```
@@ -93,55 +93,11 @@ class ProxyImage : public Image {
 - **Factory**: Creates real objects
 - **Singleton**: Often used with proxy
 
-## Compilation & Execution
-
-```bash
-mkdir -p build
-cd build
-cmake ..
-make
-./Proxy
-```
-
-## Expected Output
-
-```
-=== Proxy Pattern: Lazy Image Loading ===
-
-Proxies created (no real images loaded yet)
-
-Calling display on image1:
-Loading image: photo1.jpg (expensive operation)
-Displaying image: photo1.jpg
-
-Calling display on image1 again:
-Displaying image: photo1.jpg
-
-Calling display on image2:
-Loading image: photo2.jpg (expensive operation)
-Displaying image: photo2.jpg
-
-Calling display on image3:
-Loading image: photo3.jpg (expensive operation)
-Displaying image: photo3.jpg
-```
-
 ## Key Classes
 
 - **Image**: Subject interface
 - **RealImage**: Expensive real object
 - **ProxyImage**: Proxy with lazy loading
-
-## Example Usage
-
-```cpp
-ProxyImage image1("photo1.jpg");
-ProxyImage image2("photo2.jpg");
-
-image1.display();  // Loads image
-image1.display();  // Reuses loaded image
-image2.display();  // Loads different image
-```
 
 ## Notes
 
@@ -151,3 +107,10 @@ image2.display();  // Loads different image
 - Transparent to client
 - Excellent for expensive resources
 - Works well with factory patterns
+
+## C++14 Features
+
+- Move semantics: `RealImage` and `ProxyImage` constructors accept the
+  filename parameter by-value and move it into the object's member. This
+  enables callers to pass temporaries or `std::move`'d strings without extra
+  copies during construction (useful when filenames are generated at runtime).

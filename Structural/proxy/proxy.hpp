@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
 /**
  * @brief Subject - interface for real and proxy
@@ -21,10 +22,10 @@ class Image {
 
   /**
    * @brief Displays the image
-   * @side_effects Prints to console
+   * @side_effects Prints to console for demo feedback (see RealImage rationale)
    * @throws None (noexcept)
    */
-  virtual void display() const noexcept = 0;
+  virtual void Display() const noexcept = 0;
 };
 
 /**
@@ -37,13 +38,30 @@ class RealImage : public Image {
   std::string filename_;
 
  public:
-  explicit RealImage(const std::string& filename) noexcept
-      : filename_(filename) {
-    std::cout << "Loading image: " << filename << " (expensive operation)"
+  /**
+   * @brief Constructor with expensive operation simulation
+   * @param filename Image filename
+   * @side_effects Prints to console to demonstrate expensive creation
+   * @side_effects_reason Demonstration requirement: Proxy pattern controls
+   *   access to expensive resources. Console output makes lazy loading
+   *   visible, showing when RealImage is created vs cached
+   * @side_effects_what Writes to stdout for creation cost visibility
+   * @side_effects_impact Console I/O demonstrates one-time expensive operation
+   * @side_effects_alternatives Silent loading; hides proxy benefit from demo
+   * @throws None (noexcept)
+   */
+  explicit RealImage(std::string filename) noexcept
+      : filename_(std::move(filename)) {
+    std::cout << "Loading image: " << filename_ << " (expensive operation)"
               << std::endl;
   }
 
-  void display() const noexcept override {
+  /**
+   * @brief Displays the image
+   * @side_effects Prints to console (see constructor rationale)
+   * @throws None (noexcept)
+   */
+  void Display() const noexcept override {
     std::cout << "Displaying image: " << filename_ << std::endl;
   }
 };
@@ -59,12 +77,12 @@ class ProxyImage : public Image {
   mutable std::unique_ptr<RealImage> real_image_;
 
  public:
-  explicit ProxyImage(const std::string& filename) noexcept
-      : filename_(filename), real_image_(nullptr) {}
+  explicit ProxyImage(std::string filename) noexcept
+      : filename_(std::move(filename)), real_image_(nullptr) {}
 
-  void display() const noexcept override {
-    if (!real_image_) { real_image_ = std::make_unique<RealImage>(filename_); }
-    real_image_->display();
+  void Display() const noexcept override {
+    if (!real_image_) real_image_ = std::make_unique<RealImage>(filename_);
+    real_image_->Display();
   }
 
   /**
@@ -73,7 +91,7 @@ class ProxyImage : public Image {
    * @side_effects None
    * @throws None (noexcept)
    */
-  const std::string& get_filename() const noexcept { return filename_; }
+  const std::string& GetFilename() const noexcept { return filename_; }
 };
 
 #endif  // STRUCTURAL_PROXY_PROXY_HPP_

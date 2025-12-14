@@ -3,7 +3,9 @@
 // Description: Proxy design pattern demonstration
 // Copyright 2025
 
-#include "proxy.hpp"
+#include "proxy.hpp"  // [NOLINT]
+
+#include <iostream>
 
 int main() {
   std::cout << "=== Proxy Pattern: Lazy Image Loading ===" << std::endl;
@@ -15,16 +17,16 @@ int main() {
   std::cout << "\nProxies created (no real images loaded yet)" << std::endl;
 
   std::cout << "\nCalling display on image1:" << std::endl;
-  image1.display();
+  image1.Display();
 
   std::cout << "\nCalling display on image1 again:" << std::endl;
-  image1.display();  // No reload
+  image1.Display();  // No reload
 
   std::cout << "\nCalling display on image2:" << std::endl;
-  image2.display();
+  image2.Display();
 
   std::cout << "\nCalling display on image3:" << std::endl;
-  image3.display();
+  image3.Display();
 
   return 0;
 }
