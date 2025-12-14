@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 /**
@@ -21,17 +22,25 @@ class Component {
   std::string name_;
 
  public:
-  explicit Component(const std::string& name = "") noexcept : name_(name) {}
+  // Accept name by-value and move into member to enable move semantics.
+  explicit Component(std::string name = "") noexcept : name_(std::move(name)) {}
 
   virtual ~Component() = default;
 
   /**
    * @brief Displays component
    * @param indent Indentation level
-   * @side_effects Prints to console
+   * @side_effects Prints to console for tree structure visualization
+   * @side_effects_reason Demonstration requirement: Composite pattern treats
+   *   individual objects and compositions uniformly. Console output displays
+   *   the full tree structure showing composition relationships
+   * @side_effects_what Writes to stdout for tree visualization
+   * @side_effects_impact Console I/O adds minimal overhead (recursive display)
+   * @side_effects_alternatives Structure analysis without output; hides pattern
+   * demo
    * @throws None (noexcept)
    */
-  virtual void display(int indent = 0) const noexcept = 0;
+  virtual void Display(int indent = 0) const noexcept = 0;
 
   /**
    * @brief Adds child component
@@ -39,7 +48,7 @@ class Component {
    * @side_effects Updates composite structure
    * @throws None (noexcept)
    */
-  virtual void add(std::unique_ptr<Component>) noexcept {
+  virtual void Add(std::unique_ptr<Component>) noexcept {
     // Default: no-op for leaf nodes
   }
 
@@ -49,7 +58,7 @@ class Component {
    * @side_effects None
    * @throws None (noexcept)
    */
-  const std::string& get_name() const noexcept { return name_; }
+  const std::string& GetName() const noexcept { return name_; }
 };
 
 /**
@@ -62,10 +71,11 @@ class File : public Component {
   int size_;
 
  public:
-  File(const std::string& name, int size) noexcept
-      : Component(name), size_(size) {}
+  // Accept name by-value and forward (moved) into base Component.
+  File(std::string name, int size) noexcept
+      : Component(std::move(name)), size_(size) {}
 
-  void display(int indent = 0) const noexcept override {
+  void Display(int indent = 0) const noexcept override {
     for (int i = 0; i < indent; ++i) std::cout << "  ";
     std::cout << "File: " << name_ << " (" << size_ << " bytes)" << std::endl;
   }
@@ -81,16 +91,16 @@ class Directory : public Component {
   std::vector<std::unique_ptr<Component>> children_;
 
  public:
-  explicit Directory(const std::string& name) noexcept : Component(name) {}
+  explicit Directory(std::string name) noexcept : Component(std::move(name)) {}
 
-  void add(std::unique_ptr<Component> component) noexcept override {
+  void Add(std::unique_ptr<Component> component) noexcept override {
     children_.push_back(std::move(component));
   }
 
-  void display(int indent = 0) const noexcept override {
+  void Display(int indent = 0) const noexcept override {
     for (int i = 0; i < indent; ++i) std::cout << "  ";
     std::cout << "Directory: " << name_ << "/" << std::endl;
-    for (const auto& child : children_) { child->display(indent + 1); }
+    for (const auto& child : children_) child->Display(indent + 1);
   }
 
   /**
@@ -99,13 +109,13 @@ class Directory : public Component {
    * @side_effects None
    * @throws None (noexcept)
    */
-  int get_size() const noexcept {
+  int GetSize() const noexcept {
     int total = 0;
     for (const auto& child : children_) {
       // Try to cast to Directory to get size
       const Directory* dir = dynamic_cast<const Directory*>(child.get());
       if (dir) {
-        total += dir->get_size();
+        total += dir->GetSize();
       } else {
         // It's a file
         const File* file = dynamic_cast<const File*>(child.get());

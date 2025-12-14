@@ -13,12 +13,12 @@ The **Composite Pattern** allows you to compose objects into tree structures to 
 
 ## Structure
 
-```
+```text
 +-------------+
 |  Component  | (Base)
 |-------------|
-| + add()     |
-| + display() |
+| + Add()     |
+| + Display() |
 +-------------+
        ^
        |
@@ -28,8 +28,8 @@ The **Composite Pattern** allows you to compose objects into tree structures to 
  | File   | | Directory    | (Composite)
  |(Leaf)  | +--------------+
  +--------+   - children
-              + add()
-              + display()
+              + Add()
+              + Display()
 ```
 
 ## Implementation Details
@@ -40,8 +40,8 @@ All objects (leaf and composite) implement common interface:
 
 ```cpp
 class Component {
-  virtual void display(int indent = 0) = 0;
-  virtual void add(std::unique_ptr<Component> child);
+  virtual void Display(int indent = 0) = 0;
+  virtual void Add(std::unique_ptr<Component> child);
 };
 ```
 
@@ -50,8 +50,8 @@ class Component {
 ```cpp
 Directory root("root");
 Directory home("home");
-home.add(std::make_unique<File>("doc.txt", 2048));
-root.add(std::move(home));
+home.Add(std::make_unique<File>("doc.txt", 2048));
+root.Add(std::move(home));
 ```
 
 ## Use Cases
@@ -85,50 +85,11 @@ root.add(std::move(home));
 - **Decorator**: Similar recursive composition
 - **Chain of Responsibility**: Works with composite
 
-## Compilation & Execution
-
-```bash
-mkdir -p build
-cd build
-cmake ..
-make
-./Composite
-```
-
-## Expected Output
-
-```
-=== File System Hierarchy ===
-Directory: root/
-  Directory: home/
-    File: document.txt (2048 bytes)
-    File: image.jpg (4096 bytes)
-    Directory: Documents/
-      File: resume.pdf (3072 bytes)
-      File: letter.docx (1536 bytes)
-  Directory: usr/
-    Directory: bin/
-      File: gcc (8192 bytes)
-      File: make (4096 bytes)
-```
-
 ## Key Classes
 
 - **Component**: Base interface for all components
 - **File**: Leaf node (no children)
 - **Directory**: Composite node (has children)
-
-## Example Usage
-
-```cpp
-auto root = std::make_unique<Directory>("root");
-auto home = std::make_unique<Directory>("home");
-
-home->add(std::make_unique<File>("doc.txt", 2048));
-root->add(std::move(home));
-
-root->display();
-```
 
 ## Notes
 
@@ -137,3 +98,7 @@ root->display();
 - Recursive composition natural
 - Uniform treatment simplifies client code
 - Perfect for recursive hierarchies
+
+## C++14 Features
+
+- Move semantics: Component/File/Directory constructors accept name parameters by-value and move them into members (`Component(std::string name) : name_(std::move(name))`). This enables callers to pass temporaries or `std::move` existing strings to reduce copies.
