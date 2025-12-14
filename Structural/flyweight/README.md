@@ -13,12 +13,12 @@ The **Flyweight Pattern** reduces memory usage by sharing common state between m
 
 ## Structure
 
-```
+```text
 +-----------------------+
 | FlyweightFactory      |
 |-----------------------|
-| - flyweights (cache)  |
-| + get_flyweight()     |
+| - flyweights_ (cache) |
+| + GetFlyweight()      |
 +-----------------------+
            |
            | creates/returns
@@ -26,8 +26,8 @@ The **Flyweight Pattern** reduces memory usage by sharing common state between m
 +------------------+
 |   Flyweight      | (Intrinsic state)
 |------------------|
-| - font (shared)  |
-| - size (shared)  |
+| - font_ (shared) |
+| - size_ (shared) |
 +------------------+
 
 Client provides Extrinsic state:
@@ -42,12 +42,12 @@ Client provides Extrinsic state:
 ```cpp
 // Intrinsic (shared in flyweight)
 class CharacterFont {
-  std::string font;  // shared
-  int size;          // shared
+  std::string font_;  // shared
+  int size_;          // shared
 };
 
 // Extrinsic (provided by client)
-void display(char character, int x, int y);
+void Display(char character, int x, int y);
 ```
 
 ### Factory Caching
@@ -56,7 +56,7 @@ void display(char character, int x, int y);
 class FlyweightFactory {
   std::map<Key, Flyweight*> pool;
   
-  Flyweight& get(const Key& key) {
+  Flyweight& Get(const Key& key) {
     if (pool.find(key) == pool.end())
       pool[key] = new Flyweight(key);
     return pool[key];
@@ -74,7 +74,7 @@ class FlyweightFactory {
 - Web browser rendering
 
 ## Advantages
- 
+
 - Dramatically reduces memory usage
 - Improves performance for large object counts
 - Centralizes shared state management
@@ -95,51 +95,10 @@ class FlyweightFactory {
 - **Singleton**: Factory often singleton
 - **Strategy**: Different approach to optimization
 
-## Compilation & Execution
-
-```bash
-mkdir -p build
-cd build
-cmake ..
-make
-./Flyweight
-```
-
-## Expected Output
-
-```
-=== Flyweight Pattern: Font Sharing ===
-Creating new font: Arial_12
-Reusing font: Arial_12
-Creating new font: Times_14
-Creating new font: Arial_14
-
-Displaying characters:
-Char 'H' at (10,10) - Font: Arial, Size: 12
-Char 'e' at (20,10) - Font: Arial, Size: 12
-Char 'l' at (30,10) - Font: Times, Size: 14
-Char 'l' at (40,10) - Font: Arial, Size: 14
-Char 'o' at (50,10) - Font: Arial, Size: 12
-
-Total unique fonts cached: 3
-```
-
 ## Key Classes
 
 - **CharacterFont**: Flyweight storing intrinsic state
 - **CharacterFontFactory**: Factory managing flyweight pool
-
-## Example Usage
-
-```cpp
-CharacterFontFactory factory;
-
-auto arial_12 = factory.get_font("Arial", 12);
-auto arial_12_reused = factory.get_font("Arial", 12);
-
-arial_12->display('A', 10, 10);
-arial_12_reused->display('B', 20, 10);
-```
 
 ## Notes
 
@@ -149,3 +108,7 @@ arial_12_reused->display('B', 20, 10);
 - Extrinsic state passed by client
 - Client responsible for context
 - Thread-safe factory recommended
+
+## C++14 Features
+
+- Move semantics: `CharacterFont` constructor and `CharacterFontFactory::get_font` accept the font name by-value and move it into members or newly created flyweights. This allows callers to pass temporaries or `std::move` existing strings and avoid unnecessary copies when creating cached fonts.
