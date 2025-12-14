@@ -13,16 +13,16 @@ The **Facade Pattern** provides a unified, simplified interface to a set of inte
 
 ## Structure
 
-```
-+--------------------+
-|    Facade          |
-|--------------------|
-| - cpu, memory, hd  |
-| + start()          |
-| + shutdown()       |
-+--------------------+
-  |      |      |
-  v      v      v
+```text
++----------------------+
+|    Facade            |
+|----------------------|
+| - cpu_, memory_, hd_ |
+| + Start()            |
+| + Shutdown()         |
++----------------------+
+  |        |          |
+  v        v          v
  +------+ +--------+ +----------+
  | CPU  | | Memory | | HardDrive| (Subsystems)
  +------+ +--------+ +----------+
@@ -34,15 +34,15 @@ The **Facade Pattern** provides a unified, simplified interface to a set of inte
 
 ```cpp
 class ComputerFacade {
-  CPU cpu;
-  Memory memory;
-  HardDrive disk;
+  CPU cpu_;
+  Memory memory_;
+  HardDrive disk_;
   
-  void start() {
-    disk.read("boot.bin");
-    memory.load(data);
-    cpu.freeze();
-    cpu.execute(0);
+  void Start() {
+    disk.Read("boot.bin");
+    memory.Load(data);
+    cpu.Freeze();
+    cpu.Execute(0);
   }
 };
 ```
@@ -79,46 +79,10 @@ class ComputerFacade {
 - **Composite**: Can work with facade
 - **Abstract Factory**: Can use facade
 
-## Compilation & Execution
-
-```bash
-mkdir -p build
-cd build
-cmake ..
-make
-./Facade
-```
-
-## Expected Output
-
-```
-=== Computer Facade ===
-Computer starting...
-Reading file: boot.bin
-Reading file: os.bin
-Loading program: Program code from os.bin
-Freezing CPU...
-Jumping to location: 0
-Executing from location: 0
-Computer ready.
-
-Computer shutting down...
-Freezing CPU...
-Computer off.
-```
-
 ## Key Classes
 
 - **ComputerFacade**: Facade providing simplified interface
 - **CPU, Memory, HardDrive**: Subsystem components
-
-## Example Usage
-
-```cpp
-ComputerFacade computer;
-computer.start();   // Complex operation simplified
-computer.shutdown();
-```
 
 ## Notes
 

@@ -3,17 +3,19 @@
 // Description: Facade design pattern demonstration
 // Copyright 2025
 
-#include "facade.hpp"
+#include "facade.hpp"  // [NOLINT]
+
+#include <iostream>
 
 int main() {
   std::cout << "=== Computer Facade ===" << std::endl;
 
   ComputerFacade computer;
-  computer.start();
+  computer.Start();
 
   std::cout << std::endl;
 
-  computer.shutdown();
+  computer.Shutdown();
 
   return 0;
 }

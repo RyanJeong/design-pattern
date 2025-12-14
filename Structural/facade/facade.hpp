@@ -18,28 +18,34 @@ class CPU {
  public:
   /**
    * @brief Freezes CPU
-   * @side_effects Prints to console
+   * @side_effects Prints to console for demo feedback
+   * @side_effects_reason Demonstration requirement: Facade simplifies complex
+   *   subsystem interactions. Console output shows internal operations
+   *   coordinated by the facade
+   * @side_effects_what Writes to stdout for operation visibility
+   * @side_effects_impact Console I/O adds minimal overhead (per operation)
+   * @side_effects_alternatives Inject logger; adds complexity for demo
    * @throws None (noexcept)
    */
-  void freeze() const noexcept { std::cout << "Freezing CPU..." << std::endl; }
+  void Freeze() const noexcept { std::cout << "Freezing CPU..." << std::endl; }
 
   /**
    * @brief Jumps to location
    * @param location Memory location
-   * @side_effects Prints to console
+   * @side_effects Prints to console (see Freeze rationale)
    * @throws None (noexcept)
    */
-  void jump(int location) const noexcept {
+  void Jump(int location) const noexcept {
     std::cout << "Jumping to location: " << location << std::endl;
   }
 
   /**
    * @brief Executes from location
    * @param location Memory location
-   * @side_effects Prints to console
+   * @side_effects Prints to console (see Freeze rationale)
    * @throws None (noexcept)
    */
-  void execute(int location) const noexcept {
+  void Execute(int location) const noexcept {
     std::cout << "Executing from location: " << location << std::endl;
   }
 };
@@ -54,10 +60,10 @@ class Memory {
   /**
    * @brief Loads program
    * @param data Program data
-   * @side_effects Prints to console
+   * @side_effects Prints to console (see CPU::Freeze rationale)
    * @throws None (noexcept)
    */
-  void load(const std::string& data) const noexcept {
+  void Load(const std::string& data) const noexcept {
     std::cout << "Loading program: " << data << std::endl;
   }
 };
@@ -73,10 +79,10 @@ class HardDrive {
    * @brief Reads file
    * @param file Filename
    * @return File content
-   * @side_effects Prints to console
+   * @side_effects Prints to console (see CPU::Freeze rationale)
    * @throws None (noexcept)
    */
-  std::string read(const std::string& file) const noexcept {
+  std::string Read(const std::string& file) const noexcept {
     std::cout << "Reading file: " << file << std::endl;
     return "Program code from " + file;
   }
@@ -99,14 +105,14 @@ class ComputerFacade {
    * @side_effects Coordinates CPU, Memory, HardDrive
    * @throws None (noexcept)
    */
-  void start() const noexcept {
+  void Start() const noexcept {
     std::cout << "Computer starting..." << std::endl;
-    hard_drive_.read("boot.bin");
-    auto data = hard_drive_.read("os.bin");
-    memory_.load(data);
-    cpu_.freeze();
-    cpu_.jump(0);
-    cpu_.execute(0);
+    hard_drive_.Read("boot.bin");
+    auto data = hard_drive_.Read("os.bin");
+    memory_.Load(data);
+    cpu_.Freeze();
+    cpu_.Jump(0);
+    cpu_.Execute(0);
     std::cout << "Computer ready." << std::endl;
   }
 
@@ -115,9 +121,9 @@ class ComputerFacade {
    * @side_effects Coordinates shutdown
    * @throws None (noexcept)
    */
-  void shutdown() const noexcept {
+  void Shutdown() const noexcept {
     std::cout << "Computer shutting down..." << std::endl;
-    cpu_.freeze();
+    cpu_.Freeze();
     std::cout << "Computer off." << std::endl;
   }
 };
