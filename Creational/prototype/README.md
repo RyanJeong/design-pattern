@@ -43,7 +43,7 @@ The **Prototype Pattern** creates new objects by copying an existing object (pro
 ### Clone Method
 
 ```cpp
-virtual std::unique_ptr<Shape> clone() const noexcept {
+virtual std::unique_ptr<Shape> Clone() const noexcept {
   return std::make_unique<Circle>(*this);  // Copy constructor
 }
 ```
@@ -56,10 +56,10 @@ Stores prototypes for reuse:
 class ShapeRegistry {
   std::unordered_map<std::string, std::unique_ptr<Shape>> prototypes_;
   
-  void register_prototype(const std::string& key, 
+  void RegisterPrototype(const std::string& key, 
                          std::unique_ptr<Shape> shape) noexcept;
   
-  std::unique_ptr<Shape> create_shape(const std::string& key) const;
+  std::unique_ptr<Shape> CreateShape(const std::string& key) const;
 };
 ```
 
@@ -96,47 +96,11 @@ class ShapeRegistry {
 - **Builder**: Different approach to complex creation
 - **Memento**: Can use prototype for state copying
 
-## Compilation & Execution
-
-```bash
-mkdir -p build
-cd build
-cmake ..
-make
-./Prototype
-```
-
-## Expected Output
-
-```
-=== Creating Shapes from Prototypes ===
-Circle: Default Circle (radius: 5)
-Circle: Cloned Circle 2 (radius: 5)
-
-Rectangle: Default Rectangle (10 x 20)
-Rectangle: Cloned Rectangle 2 (10 x 20)
-```
-
 ## Key Classes
 
 - **Shape**: Abstract prototype with clone method
 - **Circle, Rectangle**: Concrete prototypes
 - **ShapeRegistry**: Registry managing prototypes
-
-## Example Usage
-
-```cpp
-ShapeRegistry registry;
-
-// Register prototypes
-registry.register_prototype("circle", 
-    std::make_unique<Circle>("Default Circle", 5.0));
-
-// Clone prototypes
-auto circle1 = registry.create_shape("circle");
-auto circle2 = registry.create_shape("circle");
-circle2->set_name("Cloned Circle");
-```
 
 ## Deep vs Shallow Copy
 
@@ -156,3 +120,10 @@ Circle clone = prototype;  // Deep copy via copy constructor
 - Clone method should use copy constructor
 - Registry pattern often accompanies Prototype
 - Performance benefit depends on object complexity
+
+## C++14 Features
+
+- Move semantics: Constructors and setters in the example accept string
+  parameters by-value and move them into members (e.g. `Shape(std::string name)`
+  and `set_name(std::string name)`). This enables callers to pass temporaries
+  or `std::move` existing strings to avoid unnecessary copies.

@@ -21,10 +21,18 @@ class Button {
 
   /**
    * @brief Renders button
-   * @side_effects Prints to console
+   * @side_effects Prints to console for demo feedback
+   * @side_effects_reason Demonstration requirement: Abstract Factory creates
+   *   families of related objects. Console output shows which family
+   *   (platform) implementations are being used
+   * @side_effects_what Writes to stdout for product family visibility
+   * @side_effects_impact Console I/O adds minimal overhead (one-time per
+   * render)
+   * @side_effects_alternatives Inject renderer strategy; adds complexity for
+   * demo
    * @throws None (noexcept)
    */
-  virtual void render() const noexcept = 0;
+  virtual void Render() const noexcept = 0;
 };
 
 /**
@@ -34,7 +42,7 @@ class Button {
  */
 class WindowsButton : public Button {
  public:
-  void render() const noexcept override {
+  void Render() const noexcept override {
     std::cout << "Rendering Windows button..." << std::endl;
   }
 };
@@ -46,7 +54,7 @@ class WindowsButton : public Button {
  */
 class MacButton : public Button {
  public:
-  void render() const noexcept override {
+  void Render() const noexcept override {
     std::cout << "Rendering macOS button..." << std::endl;
   }
 };
@@ -62,10 +70,10 @@ class Checkbox {
 
   /**
    * @brief Renders checkbox
-   * @side_effects Prints to console
+   * @side_effects Prints to console (see Button::Render rationale)
    * @throws None (noexcept)
    */
-  virtual void render() const noexcept = 0;
+  virtual void Render() const noexcept = 0;
 };
 
 /**
@@ -75,7 +83,7 @@ class Checkbox {
  */
 class WindowsCheckbox : public Checkbox {
  public:
-  void render() const noexcept override {
+  void Render() const noexcept override {
     std::cout << "Rendering Windows checkbox..." << std::endl;
   }
 };
@@ -87,7 +95,7 @@ class WindowsCheckbox : public Checkbox {
  */
 class MacCheckbox : public Checkbox {
  public:
-  void render() const noexcept override {
+  void Render() const noexcept override {
     std::cout << "Rendering macOS checkbox..." << std::endl;
   }
 };
@@ -107,7 +115,7 @@ class UIFactory {
    * @side_effects Creates new Button
    * @throws None (noexcept)
    */
-  virtual std::unique_ptr<Button> create_button() const noexcept = 0;
+  virtual std::unique_ptr<Button> CreateButton() const noexcept = 0;
 
   /**
    * @brief Creates checkbox
@@ -115,7 +123,7 @@ class UIFactory {
    * @side_effects Creates new Checkbox
    * @throws None (noexcept)
    */
-  virtual std::unique_ptr<Checkbox> create_checkbox() const noexcept = 0;
+  virtual std::unique_ptr<Checkbox> CreateCheckbox() const noexcept = 0;
 };
 
 /**
@@ -125,11 +133,11 @@ class UIFactory {
  */
 class WindowsFactory : public UIFactory {
  public:
-  std::unique_ptr<Button> create_button() const noexcept override {
+  std::unique_ptr<Button> CreateButton() const noexcept override {
     return std::make_unique<WindowsButton>();
   }
 
-  std::unique_ptr<Checkbox> create_checkbox() const noexcept override {
+  std::unique_ptr<Checkbox> CreateCheckbox() const noexcept override {
     return std::make_unique<WindowsCheckbox>();
   }
 };
@@ -141,11 +149,11 @@ class WindowsFactory : public UIFactory {
  */
 class MacFactory : public UIFactory {
  public:
-  std::unique_ptr<Button> create_button() const noexcept override {
+  std::unique_ptr<Button> CreateButton() const noexcept override {
     return std::make_unique<MacButton>();
   }
 
-  std::unique_ptr<Checkbox> create_checkbox() const noexcept override {
+  std::unique_ptr<Checkbox> CreateCheckbox() const noexcept override {
     return std::make_unique<MacCheckbox>();
   }
 };
@@ -162,17 +170,16 @@ class Application {
 
  public:
   explicit Application(const UIFactory& factory) noexcept
-      : button_(factory.create_button()),
-        checkbox_(factory.create_checkbox()) {}
+      : button_(factory.CreateButton()), checkbox_(factory.CreateCheckbox()) {}
 
   /**
    * @brief Renders all UI components
    * @side_effects Renders button and checkbox
    * @throws None (noexcept)
    */
-  void render() const noexcept {
-    button_->render();
-    checkbox_->render();
+  void Render() const noexcept {
+    button_->Render();
+    checkbox_->Render();
   }
 };
 

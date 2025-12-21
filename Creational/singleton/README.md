@@ -29,7 +29,7 @@ The **Singleton Pattern** ensures that a class has only one instance and provide
 Uses static variable initialization which is thread-safe in C++11 and later:
 
 ```cpp
-static Logger& get_instance() noexcept {
+static Logger& instance() noexcept {
   static Logger instance;
   return instance;
 }
@@ -72,43 +72,12 @@ static Logger& get_instance() noexcept {
 - **Abstract Factory**: Can use singletons as factories
 - **Facade**: Often implemented as singleton
 
-## Compilation & Execution
-
-```bash
-mkdir -p build
-cd build
-cmake ..
-make
-./Singleton
-```
-
-## Expected Output
-
-```
-Logger initialized
-Logging from main: Starting application
-Logging: Configuration loaded
-Logger instance ID: <address>
-Logging from function: Processing
-```
-
 ## Key Classes
 
 - **Logger**: Singleton class providing logging functionality
   - Private constructor
   - Static `get_instance()` method
   - `log()` method for logging messages
-
-## Example Usage
-
-```cpp
-Logger& logger = Logger::get_instance();
-logger.log("Application started");
-
-// Same instance from anywhere in code
-Logger& logger2 = Logger::get_instance();
-logger2.log("Still the same instance");
-```
 
 ## Notes
 

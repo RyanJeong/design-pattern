@@ -5,6 +5,8 @@
 
 #include "builder.hpp"
 
+#include <iostream>
+
 int main() {
   // Build gaming computer
   GamingComputerBuilder gaming_builder;
@@ -12,7 +14,7 @@ int main() {
                            .set_ram("32GB DDR5")
                            .set_storage("2TB NVMe SSD")
                            .set_gpu("RTX 4090")
-                           .build();
+                           .Build();
 
   std::cout << "=== Gaming PC ===" << std::endl;
   gaming_pc.display();
@@ -20,7 +22,7 @@ int main() {
   // Build workstation computer
   std::cout << "\n=== Workstation ===" << std::endl;
   WorkstationBuilder workstation_builder;
-  Computer workstation = workstation_builder.build();
+  Computer workstation = workstation_builder.Build();
   workstation.display();
 
   // Build custom computer
@@ -30,7 +32,7 @@ int main() {
                            .set_ram("16GB DDR4")
                            .set_storage("512GB SSD")
                            .set_gpu("RTX 3060")
-                           .build();
+                           .Build();
   custom_pc.display();
 
   return 0;

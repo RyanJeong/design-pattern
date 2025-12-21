@@ -13,7 +13,7 @@ The **Builder Pattern** separates the construction of a complex object from its 
 
 ## Structure
 
-```
+```text
 -----------------------
 |     Computer         | (Product)
 |----------------------|
@@ -59,7 +59,7 @@ Computer pc = builder
     .set_ram("32GB DDR5")
     .set_storage("2TB SSD")
     .set_gpu("RTX 4090")
-    .build();
+    .Build();
 ```
 
 ## Use Cases
@@ -91,41 +91,6 @@ Computer pc = builder
 - **Factory Method**: Alternative for object creation
 - **Composite**: Can use Builder for construction
 
-## Compilation & Execution
-
-```bash
-mkdir -p build
-cd build
-cmake ..
-make
-./Builder
-```
-
-## Expected Output
-
-```
-=== Gaming PC ===
-Computer Configuration:
-  CPU: Intel Core i9-12900K
-  RAM: 32GB DDR5
-  Storage: 2TB NVMe SSD
-  GPU: RTX 4090
-
-=== Workstation ===
-Computer Configuration:
-  CPU: Intel Xeon
-  RAM: 64GB DDR4
-  Storage: 2TB NVMe SSD
-  GPU: RTX A6000
-
-=== Custom PC ===
-Computer Configuration:
-  CPU: AMD Ryzen 7
-  RAM: 16GB DDR4
-  Storage: 512GB SSD
-  GPU: RTX 3060
-```
-
 ## Key Classes
 
 - **Computer**: Product class with CPU, RAM, Storage, GPU
@@ -133,27 +98,16 @@ Computer Configuration:
 - **GamingComputerBuilder**: Builds gaming-optimized computers
 - **WorkstationBuilder**: Builds workstation computers
 
-## Example Usage
-
-```cpp
-// Gaming PC builder
-GamingComputerBuilder builder;
-Computer pc = builder
-    .set_cpu("Intel Core i9-12900K")
-    .set_ram("32GB DDR5")
-    .build();
-
-// Custom builder
-ComputerBuilder custom;
-Computer custom_pc = custom
-    .set_cpu("AMD Ryzen 7")
-    .set_ram("16GB")
-    .build();
-```
-
 ## Notes
 
 - Fluent interface makes complex construction readable
 - Builders can have default configurations
 - Method chaining improves API design
+
+## C++14 Features
+
+- Move semantics: Builder setters and the `Computer` constructor accept
+  parameters by-value and move them into internal members. The `Build()`
+  implementation moves the builder's internal strings into the constructed
+  `Computer` to avoid unnecessary copies when calling `Build()`.
 - Consider immutability of final product

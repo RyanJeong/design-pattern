@@ -5,17 +5,19 @@
 
 #include "singleton.hpp"
 
+#include <iostream>
+
 int main() {
   // Get the singleton instance
-  Logger& logger1 = Logger::get_instance();
-  logger1.log("First message");
-  logger1.log("Second message");
+  Logger& logger1 = Logger::instance();
+  logger1.Log("First message");
+  logger1.Log("Second message");
 
   // Get the same instance again
-  Logger& logger2 = Logger::get_instance();
-  logger2.log("Third message");
+  Logger& logger2 = Logger::instance();
+  logger2.Log("Third message");
 
-  std::cout << "\nTotal logs: " << logger2.get_log_count() << std::endl;
+  std::cout << "\nTotal logs: " << logger2.log_count() << std::endl;
 
   // Verify it's the same instance
   std::cout << "logger1 address: " << &logger1 << std::endl;

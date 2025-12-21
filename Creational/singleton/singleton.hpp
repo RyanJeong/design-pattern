@@ -44,7 +44,7 @@ class Logger {
    * @side_effects None
    * @throws None (noexcept)
    */
-  static Logger& get_instance() noexcept {
+  static Logger& instance() noexcept {
     static Logger instance;
     return instance;
   }
@@ -52,10 +52,16 @@ class Logger {
   /**
    * @brief Logs a message
    * @param message Message to log
-   * @side_effects Increments log count and prints message
+   * @side_effects Increments log count and prints message to console
+   * @side_effects_reason Demonstration requirement: Singleton pattern ensures
+   *   a single globally accessible instance. Logging to console demonstrates
+   *   persistence of state across multiple GetInstance() calls
+   * @side_effects_what Increments counter and writes to stdout
+   * @side_effects_impact Console I/O adds minimal latency (per log call)
+   * @side_effects_alternatives Inject logger factory; adds complexity for demo
    * @throws None (noexcept)
    */
-  void log(const std::string& message) noexcept {
+  void Log(const std::string& message) noexcept {
     log_count_++;
     std::cout << "[Log " << log_count_ << "] " << message << "\n";
   }
@@ -66,7 +72,7 @@ class Logger {
    * @side_effects None
    * @throws None (noexcept)
    */
-  int get_log_count() const noexcept { return log_count_; }
+  int log_count() const noexcept { return log_count_; }
 };
 
 #endif  // CREATIONAL_SINGLETON_SINGLETON_HPP_

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
 /**
  * @brief Product - the complex object being built
@@ -23,13 +24,25 @@ class Computer {
   std::string gpu_;
 
  public:
-  explicit Computer(const std::string& cpu, const std::string& ram,
-                    const std::string& storage, const std::string& gpu) noexcept
-      : cpu_(cpu), ram_(ram), storage_(storage), gpu_(gpu) {}
+  // Accept parameters by value to allow callers to move strings in and
+  // avoid unnecessary copies. Move into members.
+  explicit Computer(std::string cpu, std::string ram, std::string storage,
+                    std::string gpu) noexcept
+      : cpu_(std::move(cpu)),
+        ram_(std::move(ram)),
+        storage_(std::move(storage)),
+        gpu_(std::move(gpu)) {}
 
   /**
    * @brief Displays computer configuration
-   * @side_effects Prints to console
+   * @side_effects Prints configuration to console for demo feedback
+   * @side_effects_reason Demonstration requirement: Builder pattern creates
+   *   complex objects step-by-step. Console output shows final configuration
+   *   without requiring test assertion infrastructure
+   * @side_effects_what Writes to stdout for configuration visibility
+   * @side_effects_impact Console I/O adds minimal overhead (one-time per build)
+   * @side_effects_alternatives Use structured return value; hides output during
+   * demo
    * @throws None (noexcept)
    */
   void display() const noexcept {
@@ -62,8 +75,8 @@ class ComputerBuilder {
    * @side_effects Updates builder state
    * @throws None (noexcept)
    */
-  virtual ComputerBuilder& set_cpu(const std::string& cpu) noexcept {
-    cpu_ = cpu;
+  virtual ComputerBuilder& set_cpu(std::string cpu) noexcept {
+    cpu_ = std::move(cpu);
     return *this;
   }
 
@@ -73,8 +86,8 @@ class ComputerBuilder {
    * @side_effects Updates builder state
    * @throws None (noexcept)
    */
-  virtual ComputerBuilder& set_ram(const std::string& ram) noexcept {
-    ram_ = ram;
+  virtual ComputerBuilder& set_ram(std::string ram) noexcept {
+    ram_ = std::move(ram);
     return *this;
   }
 
@@ -84,8 +97,8 @@ class ComputerBuilder {
    * @side_effects Updates builder state
    * @throws None (noexcept)
    */
-  virtual ComputerBuilder& set_storage(const std::string& storage) noexcept {
-    storage_ = storage;
+  virtual ComputerBuilder& set_storage(std::string storage) noexcept {
+    storage_ = std::move(storage);
     return *this;
   }
 
@@ -95,8 +108,8 @@ class ComputerBuilder {
    * @side_effects Updates builder state
    * @throws None (noexcept)
    */
-  virtual ComputerBuilder& set_gpu(const std::string& gpu) noexcept {
-    gpu_ = gpu;
+  virtual ComputerBuilder& set_gpu(std::string gpu) noexcept {
+    gpu_ = std::move(gpu);
     return *this;
   }
 
@@ -106,8 +119,10 @@ class ComputerBuilder {
    * @side_effects Creates new Computer
    * @throws None (noexcept)
    */
-  virtual Computer build() noexcept {
-    return Computer(cpu_, ram_, storage_, gpu_);
+  virtual Computer Build() noexcept {
+    // Move builder strings into the constructed Computer to avoid copies.
+    return Computer(std::move(cpu_), std::move(ram_), std::move(storage_),
+                    std::move(gpu_));
   }
 };
 

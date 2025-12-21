@@ -58,7 +58,7 @@ The **Factory Method Pattern** defines an interface for creating objects in a su
 ### Factory Method
 
 ```cpp
-virtual std::unique_ptr<Document> create_document() const noexcept = 0;
+virtual std::unique_ptr<Document> CreateDocument() const noexcept = 0;
 ```
 
 ## Use Cases
@@ -91,53 +91,12 @@ virtual std::unique_ptr<Document> create_document() const noexcept = 0;
 - **Singleton**: Factory method can return singleton
 - **Prototype**: Alternative for object creation
 
-## Compilation & Execution
-
-```bash
-mkdir -p build
-cd build
-cmake ..
-make
-./FactoryMethod
-```
-
-## Expected Output
-
-```
-=== PDF Application ===
-Opening PDF document...
-Saving PDF document...
-Closing PDF document...
-
-=== Word Application ===
-Opening Word document...
-Saving Word document...
-Closing Word document...
-
-=== Text Application ===
-Opening Text document...
-Saving Text document...
-Closing Text document...
-```
-
 ## Key Classes
 
 - **Document**: Abstract product interface
 - **PdfDocument, WordDocument, TextDocument**: Concrete products
 - **Application**: Abstract creator with factory method
 - **PdfApplication, WordApplication, TextApplication**: Concrete creators
-
-## Example Usage
-
-```cpp
-// Create PDF application
-PdfApplication pdf_app;
-pdf_app.new_document();  // Creates PDF document
-
-// Create Word application
-WordApplication word_app;
-word_app.new_document();  // Creates Word document
-```
 
 ## Notes
 

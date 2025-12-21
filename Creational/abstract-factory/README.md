@@ -13,30 +13,31 @@ The **Abstract Factory Pattern** provides an interface for creating families of 
 
 ## Structure
 
-```
+```text
 -------------------------------
-|         UIFactory            | (Abstract Factory)
-|------------------------------|
-| + create_button()            |
-| + create_checkbox()          |
+|         UIFactory           | (Abstract Factory)
+|-----------------------------|
+| + CreateButton()            |
+| + CreateCheckbox()          |
 -------------------------------
-     ^                    ^
-     |                    |
-  +----+--+            +----+--+
-  |        |            |       |
- +----------+ +----------+
- | Windows  | |   Mac    |
- | Factory  | |  Factory |
- +----------+ +----------+
-  |              |
-  +----+----+----+
-     |    |
-    Button Checkbox (Abstract Products)
-     |    |
-     +----+
-     |
-    (Windows)   (Mac)
-    Products     Products
+  ^                ^
+  |                |
+ +----------+     +----------+
+ | Windows  |     | Mac      |
+ | Factory  |     | Factory  |
+ +----------+     +----------+
+  |                |
+  +----+-----------+
+       |
+     +---------------------+
+     | Button Checkbox     |
+     | (Abstract Products) |
+     +---------------------+
+       |            |
++-----------+      +----------+
+| (Windows) |      | (Mac)    |
+| Products  |      | Products |
++-----------+      +----------+
 ```
 
 ## Implementation Details
@@ -52,8 +53,8 @@ The **Abstract Factory Pattern** provides an interface for creating families of 
 
 ```cpp
 class UIFactory {
-  virtual std::unique_ptr<Button> create_button() noexcept = 0;
-  virtual std::unique_ptr<Checkbox> create_checkbox() noexcept = 0;
+  virtual std::unique_ptr<Button> CreateButton() noexcept = 0;
+  virtual std::unique_ptr<Checkbox> CreateCheckbox() noexcept = 0;
 };
 ```
 
@@ -87,28 +88,6 @@ class UIFactory {
 - **Singleton**: Factories often implemented as singletons
 - **Facade**: Can use Abstract Factory internally
 
-## Compilation & Execution
-
-```bash
-mkdir -p build
-cd build
-cmake ..
-make
-./AbstractFactory
-```
-
-## Expected Output
-
-```
-=== Windows UI ===
-Rendering Windows button...
-Rendering Windows checkbox...
-
-=== macOS UI ===
-Rendering macOS button...
-Rendering macOS checkbox...
-```
-
 ## Key Classes
 
 - **UIFactory**: Abstract factory for UI components
@@ -116,20 +95,6 @@ Rendering macOS checkbox...
 - **Button, Checkbox**: Abstract product interfaces
 - **WindowsButton, MacButton, WindowsCheckbox, MacCheckbox**: Concrete products
 - **Application**: Client using factory
-
-## Example Usage
-
-```cpp
-// Create Windows UI
-WindowsFactory windows_factory;
-Application windows_app(windows_factory);
-windows_app.render();
-
-// Create macOS UI
-MacFactory mac_factory;
-Application mac_app(mac_factory);
-mac_app.render();
-```
 
 ## Notes
 

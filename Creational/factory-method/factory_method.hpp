@@ -21,24 +21,31 @@ class Document {
 
   /**
    * @brief Opens document
-   * @side_effects Prints to console
+   * @side_effects Prints to console for demo feedback
+   * @side_effects_reason Demonstration requirement: Factory Method pattern
+   *   is about delegating object creation to subclasses. Console output
+   *   demonstrates which concrete type was created and its behavior
+   * @side_effects_what Writes to stdout for document type visibility
+   * @side_effects_impact Console I/O adds minimal overhead (one-time per
+   * operation)
+   * @side_effects_alternatives Inject logger; adds complexity for demo code
    * @throws None (noexcept)
    */
-  virtual void open() const noexcept = 0;
+  virtual void Open() const noexcept = 0;
 
   /**
    * @brief Saves document
-   * @side_effects Prints to console
+   * @side_effects Prints to console (see Open() rationale)
    * @throws None (noexcept)
    */
-  virtual void save() const noexcept = 0;
+  virtual void Save() const noexcept = 0;
 
   /**
    * @brief Closes document
-   * @side_effects Prints to console
+   * @side_effects Prints to console (see Open() rationale)
    * @throws None (noexcept)
    */
-  virtual void close() const noexcept = 0;
+  virtual void Close() const noexcept = 0;
 };
 
 /**
@@ -48,15 +55,15 @@ class Document {
  */
 class PdfDocument : public Document {
  public:
-  void open() const noexcept override {
+  void Open() const noexcept override {
     std::cout << "Opening PDF document..." << std::endl;
   }
 
-  void save() const noexcept override {
+  void Save() const noexcept override {
     std::cout << "Saving PDF document..." << std::endl;
   }
 
-  void close() const noexcept override {
+  void Close() const noexcept override {
     std::cout << "Closing PDF document..." << std::endl;
   }
 };
@@ -68,15 +75,15 @@ class PdfDocument : public Document {
  */
 class WordDocument : public Document {
  public:
-  void open() const noexcept override {
+  void Open() const noexcept override {
     std::cout << "Opening Word document..." << std::endl;
   }
 
-  void save() const noexcept override {
+  void Save() const noexcept override {
     std::cout << "Saving Word document..." << std::endl;
   }
 
-  void close() const noexcept override {
+  void Close() const noexcept override {
     std::cout << "Closing Word document..." << std::endl;
   }
 };
@@ -88,15 +95,15 @@ class WordDocument : public Document {
  */
 class TextDocument : public Document {
  public:
-  void open() const noexcept override {
+  void Open() const noexcept override {
     std::cout << "Opening Text document..." << std::endl;
   }
 
-  void save() const noexcept override {
+  void Save() const noexcept override {
     std::cout << "Saving Text document..." << std::endl;
   }
 
-  void close() const noexcept override {
+  void Close() const noexcept override {
     std::cout << "Closing Text document..." << std::endl;
   }
 };
@@ -116,18 +123,18 @@ class Application {
    * @side_effects Creates new Document
    * @throws None (noexcept)
    */
-  virtual std::unique_ptr<Document> create_document() const noexcept = 0;
+  virtual std::unique_ptr<Document> CreateDocument() const noexcept = 0;
 
   /**
    * @brief Opens a new document
    * @side_effects Creates and opens document
    * @throws None (noexcept)
    */
-  void new_document() const noexcept {
-    auto doc = create_document();
-    doc->open();
-    doc->save();
-    doc->close();
+  void NewDocument() const noexcept {
+    auto doc = CreateDocument();
+    doc->Open();
+    doc->Save();
+    doc->Close();
   }
 };
 
@@ -138,7 +145,7 @@ class Application {
  */
 class PdfApplication : public Application {
  public:
-  std::unique_ptr<Document> create_document() const noexcept override {
+  std::unique_ptr<Document> CreateDocument() const noexcept override {
     return std::make_unique<PdfDocument>();
   }
 };
@@ -150,7 +157,7 @@ class PdfApplication : public Application {
  */
 class WordApplication : public Application {
  public:
-  std::unique_ptr<Document> create_document() const noexcept override {
+  std::unique_ptr<Document> CreateDocument() const noexcept override {
     return std::make_unique<WordDocument>();
   }
 };
@@ -162,7 +169,7 @@ class WordApplication : public Application {
  */
 class TextApplication : public Application {
  public:
-  std::unique_ptr<Document> create_document() const noexcept override {
+  std::unique_ptr<Document> CreateDocument() const noexcept override {
     return std::make_unique<TextDocument>();
   }
 };
