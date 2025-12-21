@@ -3,7 +3,11 @@
 // Description: Visitor design pattern demonstration
 // Copyright 2025
 
-#include "visitor.hpp"
+#include "visitor.hpp"  // [NOLINT]
+
+#include <iostream>
+#include <memory>
+#include <string>
 
 int main() {
   // Build expression: (3 + 5) - 2
@@ -16,13 +20,13 @@ int main() {
 
   // Print the expression
   PrintVisitor printer;
-  sub->accept(printer);
-  std::cout << "Expression: " << printer.str() << std::endl;
+  std::string expr = sub->Accept(printer);
+  std::cout << "Expression: " << expr << std::endl;
 
   // Evaluate the expression
   EvalVisitor evaluator;
-  sub->accept(evaluator);
-  std::cout << "Result: " << evaluator.get_result() << std::endl;
+  std::string result = evaluator.Evaluate(sub);
+  std::cout << "Result: " << result << std::endl;
 
   // Build another expression: 10 + (2 - 1)
   auto ten = std::make_shared<Literal>(10);
@@ -33,12 +37,12 @@ int main() {
 
   // Print and evaluate
   PrintVisitor printer2;
-  outer_add->accept(printer2);
-  std::cout << "\nExpression: " << printer2.str() << std::endl;
+  std::string expr2 = outer_add->Accept(printer2);
+  std::cout << "\nExpression: " << expr2 << std::endl;
 
   EvalVisitor evaluator2;
-  outer_add->accept(evaluator2);
-  std::cout << "Result: " << evaluator2.get_result() << std::endl;
+  std::string result2 = evaluator2.Evaluate(outer_add);
+  std::cout << "Result: " << result2 << std::endl;
 
   return 0;
 }

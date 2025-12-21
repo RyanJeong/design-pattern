@@ -22,7 +22,7 @@ The Command pattern is a behavioral design pattern that encapsulates a request a
 
 ## Pattern Structure
 
-```
+```text
     Command (abstract)
     /              \
 Concrete1      Concrete2

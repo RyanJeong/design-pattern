@@ -22,7 +22,7 @@ The Interpreter pattern is a behavioral design pattern that defines a grammatica
 
 ## Pattern Structure
 
-```
+```text
     Expression (abstract)
     /              \
 Terminal        NonTerminal

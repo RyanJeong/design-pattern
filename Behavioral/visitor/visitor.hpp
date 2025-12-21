@@ -29,18 +29,20 @@ class ExpressionVisitor {
   /**
    * @brief Visits literal expression
    * @param literal Literal to visit
+   * @return Visit result
    * @side_effects Depends on implementation
    * @throws None (noexcept)
    */
-  virtual void visit_literal(const Literal& literal) noexcept = 0;
+  virtual std::string VisitLiteral(const Literal& literal) const noexcept = 0;
 
   /**
    * @brief Visits binary operation
    * @param op Binary operation to visit
+   * @return Visit result
    * @side_effects Depends on implementation
    * @throws None (noexcept)
    */
-  virtual void visit_binary_op(const BinaryOp& op) noexcept = 0;
+  virtual std::string VisitBinaryOp(const BinaryOp& op) const noexcept = 0;
 };
 
 /**
@@ -55,10 +57,12 @@ class Expression {
   /**
    * @brief Accepts a visitor
    * @param visitor Visitor to accept
+   * @return Visit result
    * @side_effects Calls appropriate visit method
    * @throws None (noexcept)
    */
-  virtual void accept(ExpressionVisitor& visitor) const noexcept = 0;
+  virtual std::string Accept(
+      const ExpressionVisitor& visitor) const noexcept = 0;
 };
 
 /**
@@ -79,16 +83,17 @@ class Literal : public Expression {
    * @side_effects None
    * @throws None (noexcept)
    */
-  double get_value() const noexcept { return value_; }
+  double GetValue() const noexcept { return value_; }
 
   /**
    * @brief Accepts a visitor
    * @param visitor Visitor to accept
+   * @return Visit result
    * @side_effects Calls visit_literal
    * @throws None (noexcept)
    */
-  void accept(ExpressionVisitor& visitor) const noexcept override {
-    visitor.visit_literal(*this);
+  std::string Accept(const ExpressionVisitor& visitor) const noexcept override {
+    return visitor.VisitLiteral(*this);
   }
 };
 
@@ -120,7 +125,7 @@ class BinaryOp : public Expression {
    * @side_effects None
    * @throws None (noexcept)
    */
-  const std::shared_ptr<Expression>& get_left() const noexcept { return left_; }
+  const std::shared_ptr<Expression>& GetLeft() const noexcept { return left_; }
 
   /**
    * @brief Gets right operand
@@ -128,7 +133,7 @@ class BinaryOp : public Expression {
    * @side_effects None
    * @throws None (noexcept)
    */
-  const std::shared_ptr<Expression>& get_right() const noexcept {
+  const std::shared_ptr<Expression>& GetRight() const noexcept {
     return right_;
   }
 
@@ -138,109 +143,101 @@ class BinaryOp : public Expression {
    * @side_effects None
    * @throws None (noexcept)
    */
-  OpType get_op() const noexcept { return op_; }
+  OpType GetOp() const noexcept { return op_; }
 
   /**
    * @brief Accepts a visitor
    * @param visitor Visitor to accept
+   * @return Visit result
    * @side_effects Calls visit_binary_op
    * @throws None (noexcept)
    */
-  void accept(ExpressionVisitor& visitor) const noexcept override {
-    visitor.visit_binary_op(*this);
+  std::string Accept(const ExpressionVisitor& visitor) const noexcept override {
+    return visitor.VisitBinaryOp(*this);
   }
 };
 
 /**
  * @brief Concrete visitor for printing expressions
  * @note Converts expression tree to string
- * @side_effects Builds string representation
+ * @side_effects None (returns string)
  */
 class PrintVisitor : public ExpressionVisitor {
- private:
-  std::ostringstream oss_;
-
  public:
   /**
-   * @brief Visits literal by appending to output
+   * @brief Visits literal by converting to string
    * @param literal Literal to visit
-   * @side_effects Appends value to stream
-   * @throws None (noexcept)
-   */
-  void visit_literal(const Literal& literal) noexcept override {
-    oss_ << literal.get_value();
-  }
-
-  /**
-   * @brief Visits binary operation by visiting operands
-   * @param op Binary operation to visit
-   * @side_effects Recursively visits and formats operation
-   * @throws None (noexcept)
-   */
-  void visit_binary_op(const BinaryOp& op) noexcept override {
-    oss_ << "(";
-    op.get_left()->accept(*this);
-    oss_ << (op.get_op() == BinaryOp::ADD ? " + " : " - ");
-    op.get_right()->accept(*this);
-    oss_ << ")";
-  }
-
-  /**
-   * @brief Gets string representation
-   * @return Result string
+   * @return String representation of value
    * @side_effects None
    * @throws None (noexcept)
    */
-  std::string str() const noexcept { return oss_.str(); }
+  std::string VisitLiteral(const Literal& literal) const noexcept override {
+    return std::to_string(static_cast<int>(literal.GetValue()));
+  }
+
+  /**
+   * @brief Visits binary operation
+   * @param op Binary operation to visit
+   * @return String representation of operation
+   * @side_effects None (returns formatted string)
+   * @throws None (noexcept)
+   */
+  std::string VisitBinaryOp(const BinaryOp& op) const noexcept override {
+    std::string left = op.GetLeft()->Accept(*this);
+    std::string right = op.GetRight()->Accept(*this);
+    std::string op_str = (op.GetOp() == BinaryOp::ADD) ? " + " : " - ";
+    return "(" + left + op_str + right + ")";
+  }
 };
 
 /**
  * @brief Concrete visitor for evaluating expressions
  * @note Calculates expression result
- * @side_effects Computes numeric result
+ * @side_effects None (returns computed value)
  */
 class EvalVisitor : public ExpressionVisitor {
- private:
-  double result_{0};
-
  public:
   /**
-   * @brief Visits literal by storing value
+   * @brief Visits literal by returning value
    * @param literal Literal to visit
-   * @side_effects Sets result to literal value
+   * @return String representation of value
+   * @side_effects None
    * @throws None (noexcept)
    */
-  void visit_literal(const Literal& literal) noexcept override {
-    result_ = literal.get_value();
+  std::string VisitLiteral(const Literal& literal) const noexcept override {
+    return std::to_string(static_cast<int>(literal.GetValue()));
   }
 
   /**
    * @brief Visits binary operation and evaluates
    * @param op Binary operation to visit
-   * @side_effects Recursively evaluates and stores result
+   * @return String representation of result
+   * @side_effects None (returns computed value)
    * @throws None (noexcept)
    */
-  void visit_binary_op(const BinaryOp& op) noexcept override {
-    EvalVisitor left_eval;
-    op.get_left()->accept(left_eval);
+  std::string VisitBinaryOp(const BinaryOp& op) const noexcept override {
+    std::string left_result = op.GetLeft()->Accept(*this);
+    std::string right_result = op.GetRight()->Accept(*this);
 
-    EvalVisitor right_eval;
-    op.get_right()->accept(right_eval);
+    double left_val = std::stod(left_result);
+    double right_val = std::stod(right_result);
 
-    if (op.get_op() == BinaryOp::ADD) {
-      result_ = left_eval.result_ + right_eval.result_;
-    } else {
-      result_ = left_eval.result_ - right_eval.result_;
-    }
+    double result = (op.GetOp() == BinaryOp::ADD) ? (left_val + right_val)
+                                                  : (left_val - right_val);
+
+    return std::to_string(static_cast<int>(result));
   }
 
   /**
-   * @brief Gets evaluation result
-   * @return Numeric result
+   * @brief Evaluates expression
+   * @param expr Expression to evaluate
+   * @return Numeric result as string
    * @side_effects None
    * @throws None (noexcept)
    */
-  double get_result() const noexcept { return result_; }
+  std::string Evaluate(const std::shared_ptr<Expression>& expr) const noexcept {
+    return expr->Accept(*this);
+  }
 };
 
 #endif  // BEHAVIORAL_VISITOR_VISITOR_HPP_

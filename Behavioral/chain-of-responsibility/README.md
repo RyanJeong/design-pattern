@@ -21,7 +21,7 @@ The Chain of Responsibility pattern is a behavioral design pattern that lets you
 
 ## Pattern Structure
 
-```
+```text
       Handler
     /        \
   Concrete1  Concrete2
@@ -78,3 +78,9 @@ The implementation demonstrates:
 - Approval workflows with multiple levels
 - Error handling and logging systems
 - ATM transaction processing
+
+## C++14 Features
+
+- Move semantics: The `Creature` constructor now accepts the `name` parameter
+  by value and moves it into the internal member. This allows constructors to
+  accept temporaries or `std::move`'d strings without an extra copy.

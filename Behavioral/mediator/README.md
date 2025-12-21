@@ -22,7 +22,7 @@ The Mediator pattern is a behavioral design pattern that defines an object that 
 
 ## Pattern Structure
 
-```
+```text
       Mediator (abstract)
            |
       ChatRoom
@@ -86,3 +86,7 @@ The implementation demonstrates:
 - Game multiplayer lobbies
 - Workflow engines
 - Dialog box handling in UI frameworks
+
+## C++14 Features
+
+- Move semantics: Colleague/User constructors accept the name parameter by-value and move it into the member (e.g. `Colleague(Mediator*, std::string name)` then `name_ = std::move(name)`). This lets callers pass temporaries or `std::move` existing strings to avoid unnecessary copies.

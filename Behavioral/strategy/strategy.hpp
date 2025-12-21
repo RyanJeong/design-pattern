@@ -1,6 +1,6 @@
 // Created: 2025-11-03
 // Filename: strategy.hpp
-// Description: Strategy design pattern implementation
+// Description: Strategy design pattern demonstration
 // Copyright 2025
 
 #ifndef BEHAVIORAL_STRATEGY_STRATEGY_HPP_
@@ -21,85 +21,82 @@ class ListStrategy {
   virtual ~ListStrategy() = default;
 
   /**
-   * @brief Starts list rendering
-   * @param oss Output string stream
-   * @side_effects May append to stream
+   * @brief Formats list start
+   * @return Formatted string for list start
+   * @side_effects None
    * @throws None (noexcept)
    */
-  virtual void start(std::ostringstream&) noexcept {}
+  virtual std::string FormatStart() const noexcept { return ""; }
 
   /**
-   * @brief Ends list rendering
-   * @param oss Output string stream
-   * @side_effects May append to stream
+   * @brief Formats list end
+   * @return Formatted string for list end
+   * @side_effects None
    * @throws None (noexcept)
    */
-  virtual void end(std::ostringstream&) noexcept {}
+  virtual std::string FormatEnd() const noexcept { return ""; }
 
   /**
-   * @brief Adds list item
-   * @param oss Output string stream
-   * @param item Item to add
-   * @side_effects Appends to stream
+   * @brief Formats a list item
+   * @param item Item to format
+   * @return Formatted item string
+   * @side_effects None
    * @throws None (noexcept)
    */
-  virtual void add_list_item(std::ostringstream& oss,
-                             const std::string& item) noexcept = 0;
+  virtual std::string FormatItem(const std::string& item) const noexcept = 0;
 };
 
 /**
  * @brief Markdown list rendering strategy
  * @note Renders lists in Markdown format
- * @side_effects Appends to stream
+ * @side_effects None
  */
 class MarkdownListStrategy : public ListStrategy {
  public:
   /**
-   * @brief Adds list item in Markdown format
-   * @param oss Output string stream
-   * @param item Item to add
-   * @side_effects Appends " * item\n" to stream
+   * @brief Formats list item in Markdown format
+   * @param item Item to format
+   * @return Formatted item
+   * @side_effects None
    * @throws None (noexcept)
    */
-  void add_list_item(std::ostringstream& oss,
-                     const std::string& item) noexcept override {
-    oss << " * " << item << "\n";
+  std::string FormatItem(const std::string& item) const noexcept override {
+    return " * " + item + "\n";
   }
 };
 
 /**
  * @brief HTML list rendering strategy
  * @note Renders lists in HTML format
- * @side_effects Appends to stream
+ * @side_effects None
  */
 class HtmlListStrategy : public ListStrategy {
  public:
   /**
-   * @brief Starts HTML list
-   * @param oss Output string stream
-   * @side_effects Appends "<ul>\n" to stream
+   * @brief Formats list start
+   * @return HTML list start tag
+   * @side_effects None
    * @throws None (noexcept)
    */
-  void start(std::ostringstream& oss) noexcept override { oss << "<ul>\n"; }
+  std::string FormatStart() const noexcept override { return "<ul>\n"; }
 
   /**
-   * @brief Ends HTML list
-   * @param oss Output string stream
-   * @side_effects Appends "</ul>\n" to stream
+   * @brief Formats list end
+   * @return HTML list end tag
+   * @side_effects None
    * @throws None (noexcept)
    */
-  void end(std::ostringstream& oss) noexcept override { oss << "</ul>\n"; }
+  std::string FormatEnd() const noexcept override { return "</ul>\n"; }
 
   /**
-   * @brief Adds list item in HTML format
-   * @param oss Output string stream
-   * @param item Item to add
-   * @side_effects Appends "<li>item</li>\n" to stream
+   * @brief Formats list item in HTML format
+   * @param item Item to format
+   * @return Formatted item
+   * @side_effects None
    * @throws None (noexcept)
    */
-  void add_list_item(std::ostringstream& oss,
-                     const std::string& item) noexcept override {
-    oss << "<li>" << item << "</li>\n";
+  std::string FormatItem(const std::string& item) const noexcept override {
+    return "<li>" + item + "</li>\n";
   }
 };
 
@@ -110,43 +107,59 @@ class HtmlListStrategy : public ListStrategy {
  */
 class TextProcessor {
  private:
-  std::ostringstream oss_;
+  std::string buffer_;
   std::shared_ptr<ListStrategy> list_strategy_;
 
  public:
   /**
    * @brief Clears the buffer
-   * @side_effects Clears ostringstream
+   * @return Empty string (for chaining)
+   * @side_effects Clears internal buffer
    * @throws None (noexcept)
    */
-  void clear() noexcept {
-    oss_.str("");
-    oss_.clear();
+  TextProcessor Clear() const noexcept {
+    TextProcessor processor;
+    processor.list_strategy_ = list_strategy_;
+    return processor;
   }
 
   /**
    * @brief Sets the output format strategy
    * @param strategy New strategy
+   * @return Reference to this processor
    * @side_effects Changes internal strategy
    * @throws None (noexcept)
    */
-  void set_strategy(std::shared_ptr<ListStrategy> strategy) noexcept {
-    list_strategy_ = strategy;
+  TextProcessor WithStrategy(
+      std::shared_ptr<ListStrategy> strategy) const noexcept {
+    TextProcessor processor;
+    processor.buffer_ = buffer_;
+    processor.list_strategy_ = strategy;
+    return processor;
   }
 
   /**
    * @brief Appends list with current strategy
    * @param items Items to add
-   * @side_effects Appends rendered list to stream
+   * @return New processor with appended list
+   * @side_effects None (returns new object)
    * @throws None (noexcept)
    */
-  void append_list(const std::vector<std::string>& items) noexcept {
-    if (!list_strategy_) return;
-    list_strategy_->start(oss_);
+  TextProcessor AppendList(
+      const std::vector<std::string>& items) const noexcept {
+    TextProcessor result;
+    result.buffer_ = buffer_;
+    result.list_strategy_ = list_strategy_;
+
+    if (!list_strategy_) return result;
+
+    result.buffer_ += list_strategy_->FormatStart();
     for (const auto& item : items) {
-      list_strategy_->add_list_item(oss_, item);
+      result.buffer_ += list_strategy_->FormatItem(item);
     }
-    list_strategy_->end(oss_);
+    result.buffer_ += list_strategy_->FormatEnd();
+
+    return result;
   }
 
   /**
@@ -155,7 +168,7 @@ class TextProcessor {
    * @side_effects None
    * @throws None (noexcept)
    */
-  std::string str() const noexcept { return oss_.str(); }
+  std::string str() const noexcept { return buffer_; }
 };
 
 #endif  // BEHAVIORAL_STRATEGY_STRATEGY_HPP_

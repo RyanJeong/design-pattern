@@ -3,23 +3,24 @@
 // Description: Strategy design pattern demonstration
 // Copyright 2025
 
-#include "strategy.hpp"
+#include "strategy.hpp"  // [NOLINT]
 
 #include <iostream>
 
 int main() {
-  TextProcessor processor;
-
   // Use Markdown strategy
-  processor.set_strategy(std::make_shared<MarkdownListStrategy>());
-  processor.append_list({"alpha", "beta", "gamma"});
-  std::cout << "Markdown format:\n" << processor.str();
+  TextProcessor md_processor;
+  auto md_result =
+      md_processor.WithStrategy(std::make_shared<MarkdownListStrategy>())
+          .AppendList({"alpha", "beta", "gamma"});
+  std::cout << "Markdown format:\n" << md_result.str();
 
-  // Clear and use HTML strategy
-  processor.clear();
-  processor.set_strategy(std::make_shared<HtmlListStrategy>());
-  processor.append_list({"one", "two", "three"});
-  std::cout << "\nHTML format:\n" << processor.str();
+  // Use HTML strategy with different processor
+  TextProcessor html_processor;
+  auto html_result =
+      html_processor.WithStrategy(std::make_shared<HtmlListStrategy>())
+          .AppendList({"one", "two", "three"});
+  std::cout << "\nHTML format:\n" << html_result.str();
 
   return 0;
 }

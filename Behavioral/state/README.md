@@ -21,7 +21,7 @@ The State pattern is a behavioral design pattern that allows an object to alter 
 
 ## Pattern Structure
 
-```
+```text
      Context
        |
     State (abstract)

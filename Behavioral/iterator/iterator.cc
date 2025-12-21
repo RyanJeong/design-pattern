@@ -3,36 +3,38 @@
 // Description: Iterator design pattern demonstration
 // Copyright 2025
 
-#include "iterator.hpp"
+#include "iterator.hpp"  // [NOLINT]
 
 #include <iostream>
 #include <string>
 
 int main() {
   VectorCollection<std::string> collection;
-  collection.add_item("First");
-  collection.add_item("Second");
-  collection.add_item("Third");
-  collection.add_item("Fourth");
+  collection.AddItem("First");
+  collection.AddItem("Second");
+  collection.AddItem("Third");
+  collection.AddItem("Fourth");
 
-  auto iterator = collection.create_iterator();
+  auto iterator = collection.CreateIterator();
 
   std::cout << "Iterating through collection:" << std::endl;
-  while (iterator->has_next()) {
-    std::cout << "  - " << iterator->next() << std::endl;
+  while (iterator->HasNext()) {
+    auto state = iterator->Next();
+    std::cout << "  - " << state.current_value << std::endl;
   }
 
   // Demonstrate with numbers
   VectorCollection<int> numbers;
-  numbers.add_item(10);
-  numbers.add_item(20);
-  numbers.add_item(30);
+  numbers.AddItem(10);
+  numbers.AddItem(20);
+  numbers.AddItem(30);
 
-  auto num_iterator = numbers.create_iterator();
+  auto num_iterator = numbers.CreateIterator();
 
   std::cout << "\nIterating through numbers:" << std::endl;
-  while (num_iterator->has_next()) {
-    std::cout << "  - " << num_iterator->next() << std::endl;
+  while (num_iterator->HasNext()) {
+    auto state = num_iterator->Next();
+    std::cout << "  - " << state.current_value << std::endl;
   }
 
   return 0;

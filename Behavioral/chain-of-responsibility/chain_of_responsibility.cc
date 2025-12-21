@@ -11,39 +11,39 @@ int main() {
   // Create a creature with initial attributes
   Creature goblin("Goblin", 1, 1);
 
-  std::cout << "Initial state: " << goblin.get_name()
-            << " (Attack: " << goblin.get_attack()
-            << ", Defense: " << goblin.get_defense() << ")" << std::endl;
+  std::cout << "Initial state: " << goblin.GetName()
+            << " (Attack: " << goblin.GetAttack()
+            << ", Defense: " << goblin.GetDefense() << ")" << std::endl;
 
   // Build the chain: double attack twice, then increase defense
-  auto double_attack_1 = std::make_shared<DoubleAttackModifier>(goblin);
+  auto double_attack_1 = std::make_shared<DoubleAttackModifier>();
   auto double_attack_2 =
-      std::make_shared<DoubleAttackModifier>(goblin, double_attack_1);
+      std::make_shared<DoubleAttackModifier>(double_attack_1);
   auto increase_defense =
-      std::make_shared<IncreaseDefenseModifier>(goblin, double_attack_2);
+      std::make_shared<IncreaseDefenseModifier>(double_attack_2);
 
-  // Process the chain
-  increase_defense->handle();
+  // Process the chain - returns modified creature
+  Creature modified_goblin = increase_defense->Handle(goblin);
 
-  std::cout << "After modifiers: " << goblin.get_name()
-            << " (Attack: " << goblin.get_attack()
-            << ", Defense: " << goblin.get_defense() << ")" << std::endl;
+  std::cout << "After modifiers: " << modified_goblin.GetName()
+            << " (Attack: " << modified_goblin.GetAttack()
+            << ", Defense: " << modified_goblin.GetDefense() << ")"
+            << std::endl;
 
   // Demonstrate blocking chain with NoBonusesModifier
   Creature dragon("Dragon", 2, 2);
-  std::cout << "\nInitial state: " << dragon.get_name()
-            << " (Attack: " << dragon.get_attack()
-            << ", Defense: " << dragon.get_defense() << ")" << std::endl;
+  std::cout << "\nInitial state: " << dragon.GetName()
+            << " (Attack: " << dragon.GetAttack()
+            << ", Defense: " << dragon.GetDefense() << ")" << std::endl;
 
   auto no_bonus = std::make_shared<NoBonusesModifier>();
-  auto double_attack_blocked =
-      std::make_shared<DoubleAttackModifier>(dragon, no_bonus);
+  auto double_attack_blocked = std::make_shared<DoubleAttackModifier>(no_bonus);
 
-  double_attack_blocked->handle();
+  Creature blocked_dragon = double_attack_blocked->Handle(dragon);
 
-  std::cout << "After blocked chain: " << dragon.get_name()
-            << " (Attack: " << dragon.get_attack()
-            << ", Defense: " << dragon.get_defense() << ")" << std::endl;
+  std::cout << "After blocked chain: " << blocked_dragon.GetName()
+            << " (Attack: " << blocked_dragon.GetAttack()
+            << ", Defense: " << blocked_dragon.GetDefense() << ")" << std::endl;
 
   return 0;
 }

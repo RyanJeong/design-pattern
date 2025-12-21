@@ -3,7 +3,10 @@
 // Description: Interpreter design pattern demonstration
 // Copyright 2025
 
-#include "interpreter.hpp"
+#include "interpreter.hpp"  // [NOLINT]
+
+#include <iostream>
+#include <memory>
 
 int main() {
   // Build expression tree: ((5 + 3) * 2) - 4
@@ -20,7 +23,7 @@ int main() {
   auto mul_expr = std::make_shared<Multiply>(add_expr, two);
   auto sub_expr = std::make_shared<Subtract>(mul_expr, four);
 
-  std::cout << "Expression: ((5 + 3) * 2) - 4 = " << sub_expr->evaluate()
+  std::cout << "Expression: ((5 + 3) * 2) - 4 = " << sub_expr->Evaluate()
             << std::endl;
 
   // Another expression: 10 - (3 * 2)
@@ -31,7 +34,7 @@ int main() {
   auto mul_expr2 = std::make_shared<Multiply>(three, two);
   auto sub_expr2 = std::make_shared<Subtract>(ten, mul_expr2);
 
-  std::cout << "Expression: 10 - (3 * 2) = " << sub_expr2->evaluate()
+  std::cout << "Expression: 10 - (3 * 2) = " << sub_expr2->Evaluate()
             << std::endl;
 
   return 0;

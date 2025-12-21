@@ -9,12 +9,29 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
+
+/**
+ * @brief Notification event
+ * @note Immutable representation of property change
+ */
+struct PropertyChange {
+  std::string property;
+  std::string old_value;
+  std::string new_value;
+
+  PropertyChange(std::string prop, std::string old_val,
+                 std::string new_val) noexcept
+      : property(std::move(prop)),
+        old_value(std::move(old_val)),
+        new_value(std::move(new_val)) {}
+};
 
 /**
  * @brief Abstract observer interface
  * @note Base class for all observers
- * @side_effects None (abstract)
+ * @side_effects Observers must document their specific side effects
  */
 class Observer {
  public:
@@ -22,29 +39,28 @@ class Observer {
 
   /**
    * @brief Called when observed object changes
-   * @param property Property name that changed
-   * @param new_value New value (as string for simplicity)
-   * @side_effects Depends on concrete implementation
+   * @param change Property change event
+   * @side_effects Observer-specific (documented in implementations)
    * @throws None (noexcept)
    */
-  virtual void update(const std::string& property,
-                      const std::string& new_value) noexcept = 0;
+  virtual void OnPropertyChanged(const PropertyChange& change) noexcept = 0;
 };
 
 /**
  * @brief Subject that is observed
- * @note Maintains list of observers and notifies on state change
- * @thread_safety Not thread-safe
+ * @note Immutable object that creates new instances with updated values
+ * @thread_safety Not thread-safe (mutable observer list side effect)
  */
 class Person {
  private:
   std::string name_;
   int age_;
-  std::vector<std::shared_ptr<Observer>> observers_;
+  mutable std::vector<std::shared_ptr<Observer>> observers_;
 
  public:
-  explicit Person(const std::string& name, int age) noexcept
-      : name_(name), age_(age) {}
+  // Accept name by-value and move into member to enable move semantics.
+  explicit Person(std::string name, int age) noexcept
+      : name_(std::move(name)), age_(age) {}
 
   /**
    * @brief Gets person name
@@ -52,7 +68,7 @@ class Person {
    * @side_effects None
    * @throws None (noexcept)
    */
-  const std::string& get_name() const noexcept { return name_; }
+  const std::string& GetName() const noexcept { return name_; }
 
   /**
    * @brief Gets person age
@@ -60,66 +76,83 @@ class Person {
    * @side_effects None
    * @throws None (noexcept)
    */
-  int get_age() const noexcept { return age_; }
+  int GetAge() const noexcept { return age_; }
 
   /**
-   * @brief Sets person age and notifies observers
-   * @param age New age
-   * @side_effects Modifies age and notifies all observers
+   * @brief Returns person with updated age
+   * @param new_age New age value
+   * @return New person instance with updated age
+   * @side_effects None (returns new object, notifies observers)
    * @throws None (noexcept)
    */
-  void set_age(int age) noexcept {
-    if (age_ == age) return;
-    age_ = age;
-    notify("age", std::to_string(age));
+  Person WithAge(int new_age) const noexcept {
+    if (age_ == new_age) return *this;
+
+    Person updated(name_, new_age);
+    updated.observers_ = observers_;
+
+    // Notify observers of the change (side effect - documented)
+    PropertyChange change("age", std::to_string(age_), std::to_string(new_age));
+    updated.Notify(change);
+
+    return updated;
   }
 
   /**
    * @brief Subscribes an observer
    * @param observer Observer to subscribe
+   * @return New person with registered observer
    * @side_effects Adds observer to list
    * @throws None (noexcept)
    */
-  void subscribe(std::shared_ptr<Observer> observer) noexcept {
-    observers_.push_back(observer);
+  Person Subscribe(std::shared_ptr<Observer> observer) const noexcept {
+    Person subscribed(*this);
+    subscribed.observers_.push_back(observer);
+    return subscribed;
   }
 
   /**
    * @brief Notifies all observers of a change
-   * @param property Property that changed
-   * @param new_value New value
-   * @side_effects Calls update on all observers
+   * @param change Property change event
+   * @side_effects Calls OnPropertyChanged on all observers
    * @throws None (noexcept)
    */
-  void notify(const std::string& property,
-              const std::string& new_value) noexcept {
-    for (auto& observer : observers_) { observer->update(property, new_value); }
+  void Notify(const PropertyChange& change) const noexcept {
+    for (auto& observer : observers_) observer->OnPropertyChanged(change);
   }
 };
 
 /**
  * @brief Concrete observer that prints changes to console
  * @note Receives notifications from subject
- * @side_effects Prints to standard output
+ * @side_effects Prints to standard output for demo feedback
  */
 class ConsoleObserver : public Observer {
  private:
   std::string name_;
 
  public:
-  explicit ConsoleObserver(const std::string& name) noexcept : name_(name) {}
+  // Accept name by-value and move into member to avoid extra copies when
+  // callers pass temporaries or std::move'd strings.
+  explicit ConsoleObserver(std::string name) noexcept
+      : name_(std::move(name)) {}
 
   /**
    * @brief Called when observed object changes
-   * @param property Property name that changed
-   * @param new_value New value
-   * @side_effects Prints change notification to console
+   * @param change Property change event
+   * @side_effects Prints change notification to console for demo feedback
+   * @side_effects_reason Demonstration requirement: Observer pattern shows
+   *   how multiple objects react to changes. Console output demonstrates
+   *   notification flow without requiring complex external logging system
+   * @side_effects_what Writes to stdout for change visibility
+   * @side_effects_impact Console I/O adds latency per notification in demo
+   * context
+   * @side_effects_alternatives Inject logger; adds complexity for demo code
    * @throws None (noexcept)
    */
-  void update(const std::string& property,
-              const std::string& new_value) noexcept override {
-    std::cout << name_ << " received update: " << property << " = " << new_value
-              << std::endl;
+  void OnPropertyChanged(const PropertyChange& change) noexcept override {
+    std::cout << name_ << " received update: " << change.property << " = "
+              << change.old_value << " -> " << change.new_value << std::endl;
   }
 };
 
@@ -135,14 +168,13 @@ class LoggingObserver : public Observer {
  public:
   /**
    * @brief Called when observed object changes
-   * @param property Property name that changed
-   * @param new_value New value
+   * @param change Property change event
    * @side_effects Stores change in log vector
    * @throws None (noexcept)
    */
-  void update(const std::string& property,
-              const std::string& new_value) noexcept override {
-    log_.push_back(property + " changed to " + new_value);
+  void OnPropertyChanged(const PropertyChange& change) noexcept override {
+    log_.push_back(change.property + ": " + change.old_value + " -> " +
+                   change.new_value);
   }
 
   /**
@@ -151,7 +183,7 @@ class LoggingObserver : public Observer {
    * @side_effects None
    * @throws None (noexcept)
    */
-  const std::vector<std::string>& get_log() const noexcept { return log_; }
+  const std::vector<std::string>& GetLog() const noexcept { return log_; }
 };
 
 #endif  // BEHAVIORAL_OBSERVER_OBSERVER_HPP_

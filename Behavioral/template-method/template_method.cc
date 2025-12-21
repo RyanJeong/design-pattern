@@ -3,16 +3,24 @@
 // Description: Template Method design pattern demonstration
 // Copyright 2025
 
-#include "template_method.hpp"
+#include "template_method.hpp"  // [NOLINT]
+
+#include <iostream>
 
 int main() {
   std::cout << "=== Playing Chess ===" << std::endl;
   Chess chess;
-  chess.play();
+  GameResult chess_result = chess.Play();
+  std::cout << "Winner: Player " << chess_result.winner_id
+            << " (Total turns: " << chess_result.total_turns << ")"
+            << std::endl;
 
   std::cout << "\n=== Playing Checkers ===" << std::endl;
   Checkers checkers;
-  checkers.play();
+  GameResult checkers_result = checkers.Play();
+  std::cout << "Winner: Player " << checkers_result.winner_id
+            << " (Total turns: " << checkers_result.total_turns << ")"
+            << std::endl;
 
   return 0;
 }

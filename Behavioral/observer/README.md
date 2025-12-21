@@ -21,7 +21,7 @@ The Observer pattern is a behavioral design pattern that defines a one-to-many r
 
 ## Pattern Structure
 
-```
+```text
 Subject        Observer (abstract)
    \              /          \
     Concrete1  Concrete2
@@ -79,3 +79,7 @@ The implementation demonstrates:
 - UI component updates
 - Publish-subscribe messaging systems
 - Change notifications in document editors
+
+## C++14 Features
+
+- Move semantics: Subject/observer constructors (e.g. `Person` and `ConsoleObserver`) accept string parameters by-value and move them into members (`Person(std::string name, int age) : name_(std::move(name)), ...`). This avoids extra copies when callers pass temporaries or `std::move` existing strings.

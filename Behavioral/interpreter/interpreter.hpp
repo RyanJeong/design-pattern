@@ -1,6 +1,6 @@
 // Created: 2025-11-03
 // Filename: interpreter.hpp
-// Description: Interpreter design pattern implementation
+// Description: Interpreter design pattern demonstration
 // Copyright 2025
 
 #ifndef BEHAVIORAL_INTERPRETER_INTERPRETER_HPP_
@@ -26,7 +26,7 @@ class Expression {
    * @side_effects None
    * @throws None (noexcept)
    */
-  virtual int evaluate() const noexcept = 0;
+  virtual int Evaluate() const noexcept = 0;
 };
 
 /**
@@ -47,7 +47,7 @@ class Number : public Expression {
    * @side_effects None
    * @throws None (noexcept)
    */
-  int evaluate() const noexcept override { return value_; }
+  int Evaluate() const noexcept override { return value_; }
 };
 
 /**
@@ -71,8 +71,8 @@ class Add : public Expression {
    * @side_effects None
    * @throws None (noexcept)
    */
-  int evaluate() const noexcept override {
-    return left_->evaluate() + right_->evaluate();
+  int Evaluate() const noexcept override {
+    return left_->Evaluate() + right_->Evaluate();
   }
 };
 
@@ -97,8 +97,8 @@ class Subtract : public Expression {
    * @side_effects None
    * @throws None (noexcept)
    */
-  int evaluate() const noexcept override {
-    return left_->evaluate() - right_->evaluate();
+  int Evaluate() const noexcept override {
+    return left_->Evaluate() - right_->Evaluate();
   }
 };
 
@@ -123,8 +123,8 @@ class Multiply : public Expression {
    * @side_effects None
    * @throws None (noexcept)
    */
-  int evaluate() const noexcept override {
-    return left_->evaluate() * right_->evaluate();
+  int Evaluate() const noexcept override {
+    return left_->Evaluate() * right_->Evaluate();
   }
 };
 

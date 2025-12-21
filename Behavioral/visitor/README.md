@@ -22,7 +22,7 @@ The Visitor pattern is a behavioral design pattern that represents an operation 
 
 ## Pattern Structure
 
-```
+```text
   Element (abstract)         Visitor (abstract)
   /                \         /                \
 Concrete1     Concrete2   Concrete1V      Concrete2V

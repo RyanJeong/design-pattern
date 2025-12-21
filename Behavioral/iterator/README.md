@@ -22,7 +22,7 @@ The Iterator pattern is a behavioral design pattern that provides a way to acces
 
 ## Pattern Structure
 
-```
+```text
 Collection (abstract)    Iterator (abstract)
      |                          |
 Concrete1 ----creates---- Concrete1Iterator
@@ -80,3 +80,7 @@ The implementation demonstrates:
 - File system traversal
 - Tree and graph traversals
 - Generator functions in Python/C++17
+
+## C++14 Features
+
+- Move semantics: `VectorCollection::add_item` now accepts its parameter by-value and moves it into the internal vector (`void add_item(T item) { items_.push_back(std::move(item)); }`). This enables callers to pass temporaries or `std::move` existing objects without extra copies.

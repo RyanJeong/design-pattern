@@ -22,7 +22,7 @@ The Strategy pattern is a behavioral design pattern that defines a family of alg
 
 ## Pattern Structure
 
-```
+```text
     Strategy (abstract)
     /              \
 Concrete1      Concrete2

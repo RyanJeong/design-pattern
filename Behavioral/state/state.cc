@@ -3,28 +3,37 @@
 // Description: State design pattern demonstration
 // Copyright 2025
 
-#include "state.hpp"
+#include "state.hpp"  // [LOLINT]
+
+#include <iostream>
+#include <memory>
 
 LightSwitch::LightSwitch() noexcept : state_(std::make_shared<OffState>()) {}
 
-void OnState::off(LightSwitch* context) noexcept {
+std::shared_ptr<State> OnState::Off(LightSwitch*) const noexcept {
+  // VIOLATION: Prints to console for demo clarity
+  // Rationale: State transitions must be visible to demonstrate pattern
+  // Production code should use logging injection instead
   std::cout << "Switching light off...\n";
-  context->set_state(std::make_shared<OffState>());
+  return std::make_shared<OffState>();
 }
 
-void OffState::on(LightSwitch* context) noexcept {
+std::shared_ptr<State> OffState::On(LightSwitch*) const noexcept {
+  // VIOLATION: Prints to console for demo clarity
+  // Rationale: State transitions must be visible to demonstrate pattern
+  // Production code should use logging injection instead
   std::cout << "Switching light on...\n";
-  context->set_state(std::make_shared<OnState>());
+  return std::make_shared<OnState>();
 }
 
 int main() {
   LightSwitch light_switch;
 
-  light_switch.on();   // Switching light on... Light turned on
-  light_switch.off();  // Switching light off... Light turned off
-  light_switch.off();  // Light is already off
-  light_switch.on();   // Switching light on... Light turned on
-  light_switch.on();   // Light is already on
+  light_switch.On();   // Switching light on... Light turned on
+  light_switch.Off();  // Switching light off... Light turned off
+  light_switch.Off();  // Light is already off
+  light_switch.On();   // Switching light on... Light turned on
+  light_switch.On();   // Light is already on
 
   return 0;
 }

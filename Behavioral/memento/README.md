@@ -22,7 +22,7 @@ The Memento pattern is a behavioral design pattern that captures and saves the i
 
 ## Pattern Structure
 
-```
+```text
 Originator     Memento      Caretaker
    |              |             |
    +--creates---->+             |

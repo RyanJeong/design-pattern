@@ -1,6 +1,6 @@
 // Created: 2025-11-03
 // Filename: chain_of_responsibility.hpp
-// Description: Chain of Responsibility design pattern implementation
+// Description: Chain of Responsibility design pattern demonstration
 // Copyright 2025
 
 #ifndef BEHAVIORAL_CHAIN_OF_RESPONSIBILITY_CHAIN_OF_RESPONSIBILITY_HPP_
@@ -9,6 +9,9 @@
 #include <iostream>
 #include <memory>
 #include <string>
+
+// Forward declaration - Creature is defined later
+class Creature;
 
 /**
  * @brief Abstract handler in the chain
@@ -25,17 +28,19 @@ class Modifier {
   virtual ~Modifier() = default;
 
   /**
-   * @brief Processes the request and passes to next handler
-   * @side_effects May modify the creature's attributes
+   * @brief Processes the request and returns modified creature
+   * @param creature Creature to process
+   * @return Modified creature after processing chain
+   * @side_effects None (returns new state)
    * @throws None (noexcept)
    */
-  virtual void handle() noexcept = 0;
+  virtual Creature Handle(Creature creature) const noexcept = 0;
 };
 
 /**
  * @brief Represents a creature with attributes
- * @note Mutable for demonstration purposes
- * @thread_safety Not thread-safe
+ * @note Immutable value object
+ * @thread_safety Thread-safe (const object)
  */
 class Creature {
  private:
@@ -44,8 +49,10 @@ class Creature {
   int defense_;
 
  public:
-  explicit Creature(const std::string& name, int attack, int defense) noexcept
-      : name_(name), attack_(attack), defense_(defense) {}
+  // Accept name by value to enable move semantics when callers pass
+  // temporaries or std::move'd strings.
+  explicit Creature(std::string name, int attack, int defense) noexcept
+      : name_(std::move(name)), attack_(attack), defense_(defense) {}
 
   /**
    * @brief Gets creature name
@@ -53,7 +60,7 @@ class Creature {
    * @side_effects None
    * @throws None (noexcept)
    */
-  const std::string& get_name() const noexcept { return name_; }
+  const std::string& GetName() const noexcept { return name_; }
 
   /**
    * @brief Gets creature attack value
@@ -61,15 +68,18 @@ class Creature {
    * @side_effects None
    * @throws None (noexcept)
    */
-  int get_attack() const noexcept { return attack_; }
+  int GetAttack() const noexcept { return attack_; }
 
   /**
-   * @brief Sets creature attack value
+   * @brief Returns creature with modified attack value
    * @param attack New attack value
-   * @side_effects Modifies internal attack value
+   * @return New creature with updated attack
+   * @side_effects None (returns new object)
    * @throws None (noexcept)
    */
-  void set_attack(int attack) noexcept { attack_ = attack; }
+  Creature WithAttack(int attack) const noexcept {
+    return Creature(name_, attack, defense_);
+  }
 
   /**
    * @brief Gets creature defense value
@@ -77,73 +87,75 @@ class Creature {
    * @side_effects None
    * @throws None (noexcept)
    */
-  int get_defense() const noexcept { return defense_; }
+  int GetDefense() const noexcept { return defense_; }
 
   /**
-   * @brief Sets creature defense value
+   * @brief Returns creature with modified defense value
    * @param defense New defense value
-   * @side_effects Modifies internal defense value
+   * @return New creature with updated defense
+   * @side_effects None (returns new object)
    * @throws None (noexcept)
    */
-  void set_defense(int defense) noexcept { defense_ = defense; }
+  Creature WithDefense(int defense) const noexcept {
+    return Creature(name_, attack_, defense);
+  }
 };
 
 /**
  * @brief Modifier that doubles attack
  * @note Processes creature and passes to next handler
- * @side_effects Modifies creature's attack attribute
+ * @side_effects None (returns modified creature)
  */
 class DoubleAttackModifier : public Modifier {
- private:
-  Creature& creature_;
-
  public:
-  explicit DoubleAttackModifier(Creature& creature,
-                                std::shared_ptr<Modifier> next = nullptr)
-      : Modifier(next), creature_(creature) {}
+  explicit DoubleAttackModifier(std::shared_ptr<Modifier> next = nullptr)
+      : Modifier(next) {}
 
   /**
    * @brief Doubles attack and passes to next handler
-   * @side_effects Doubles creature's attack value
+   * @param creature Creature to process
+   * @return Creature with doubled attack
+   * @side_effects None (returns new object)
    * @throws None (noexcept)
    */
-  void handle() noexcept override {
-    creature_.set_attack(creature_.get_attack() * 2);
-    if (next_) { next_->handle(); }
+  Creature Handle(Creature creature) const noexcept override {
+    Creature modified = creature.WithAttack(creature.GetAttack() * 2);
+    if (next_) { return next_->Handle(modified); }
+    return modified;
   }
 };
 
 /**
  * @brief Modifier that increases defense based on attack
  * @note Only increases if attack <= 2
- * @side_effects May modify creature's defense attribute
+ * @side_effects None (returns modified creature)
  */
 class IncreaseDefenseModifier : public Modifier {
- private:
-  Creature& creature_;
-
  public:
-  explicit IncreaseDefenseModifier(Creature& creature,
-                                   std::shared_ptr<Modifier> next = nullptr)
-      : Modifier(next), creature_(creature) {}
+  explicit IncreaseDefenseModifier(std::shared_ptr<Modifier> next = nullptr)
+      : Modifier(next) {}
 
   /**
    * @brief Increases defense and passes to next handler
-   * @side_effects May increase creature's defense value
+   * @param creature Creature to process
+   * @return Creature with possibly increased defense
+   * @side_effects None (returns new object)
    * @throws None (noexcept)
    */
-  void handle() noexcept override {
-    if (creature_.get_attack() <= 2) {
-      creature_.set_defense(creature_.get_defense() + 1);
+  Creature Handle(Creature creature) const noexcept override {
+    Creature modified = creature;
+    if (creature.GetAttack() <= 2) {
+      modified = creature.WithDefense(creature.GetDefense() + 1);
     }
-    if (next_) { next_->handle(); }
+    if (next_) { return next_->Handle(modified); }
+    return modified;
   }
 };
 
 /**
  * @brief Modifier that prevents other modifications
  * @note Blocks the entire chain
- * @side_effects Terminates the chain processing
+ * @side_effects None (returns creature unchanged)
  */
 class NoBonusesModifier : public Modifier {
  public:
@@ -152,11 +164,14 @@ class NoBonusesModifier : public Modifier {
 
   /**
    * @brief Terminates chain processing
-   * @side_effects Prevents further processing
+   * @param creature Creature to process
+   * @return Unmodified creature
+   * @side_effects None (blocks chain, returns unchanged)
    * @throws None (noexcept)
    */
-  void handle() noexcept override {
-    // Do nothing - terminates the chain
+  Creature Handle(Creature creature) const noexcept override {
+    // Do not process further - terminates the chain
+    return creature;
   }
 };
 

@@ -22,7 +22,7 @@ The Template Method pattern is a behavioral design pattern that defines the skel
 
 ## Pattern Structure
 
-```
+```text
       Game (abstract)
       /              \
    Chess          Checkers
