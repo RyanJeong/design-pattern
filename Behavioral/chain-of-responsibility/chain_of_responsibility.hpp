@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
 // Forward declaration - Creature is defined later
 class Creature;
@@ -120,7 +121,7 @@ class DoubleAttackModifier : public Modifier {
    */
   Creature Handle(Creature creature) const noexcept override {
     Creature modified = creature.WithAttack(creature.GetAttack() * 2);
-    if (next_) { return next_->Handle(modified); }
+    if (next_) return next_->Handle(modified);
     return modified;
   }
 };
@@ -147,7 +148,7 @@ class IncreaseDefenseModifier : public Modifier {
     if (creature.GetAttack() <= 2) {
       modified = creature.WithDefense(creature.GetDefense() + 1);
     }
-    if (next_) { return next_->Handle(modified); }
+    if (next_) return next_->Handle(modified);
     return modified;
   }
 };
