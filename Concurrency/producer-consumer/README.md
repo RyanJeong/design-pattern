@@ -12,15 +12,79 @@ The Producer-Consumer pattern is a concurrency design pattern that coordinates w
 ## Structure
 
 ```text
-+-------------+         +-----------+         +-------------+
-| Producer 1  |-------->|           |-------->| Consumer 1  |
-| (Thread)    |         | Buffer    |         | (Thread)    |
-+-------------+         | (Queue)   |         +-------------+
-                        | (Mutex)   |
-+-------------+         | (CondVar) |         +-------------+
-| Producer 2  |-------->|           |-------->| Consumer 2  |
-| (Thread)    |         |           |         | (Thread)    |
-+-------------+         +-----------+         +-------------+
+┌──────────────────────────────┐
+│        Buffer<T>             │ ◄────── Shared Buffer (Coordination Point)
+├──────────────────────────────┤
+│ - queue: queue<T>            │
+│ - max_capacity: size_t       │
+│ - mutex: mutex               │
+│ - not_empty: condition_var   │
+│ - not_full: condition_var    │
+├──────────────────────────────┤
+│ + Produce(item: T): void     │
+│ + Consume(): T               │
+│ + IsFull(): bool             │
+│ + IsEmpty(): bool            │
+│ + GetSize(): size_t          │
+└──────────────────────────────┘
+        ▲                     ▲
+        │                     │
+      uses                  uses
+        │                     │
+┌─────────────────────────┐  ┌──────────────────┐
+│     Producer            │  │    Consumer      │
+├─────────────────────────┤  ├──────────────────┤
+│ - buffer:               │  │ - buffer:        │
+│   shared_ptr<Buffer>    │  │   shared_ptr     │
+│ - id: int               │  │   <Buffer>       │
+│ - delay: milliseconds   │  │ - id: int        │
+├─────────────────────────┤  │ - delay: ms      │
+│ + Run(): void           │  ├──────────────────┤
+│   (generates & produces)│  │ + Run(): void    │
+│                         │  │   (consumes &    │
+│                         │  │   processes)     │
+└─────────────────────────┘  └──────────────────┘
+
+Collaboration Pattern:
+
+    Producer ──┐
+               ├─► Buffer ◄──┐
+    Consumer ──┘             │
+
+    Producer calls: Buffer::Produce(item)
+    Consumer calls: Buffer::Consume() → item
+    
+    Synchronization via:
+    - mutex: Protects queue access
+    - not_empty: Signals when items available
+    - not_full: Signals when space available
+
+Thread Synchronization Flow:
+
+    Producer Thread              Buffer              Consumer Thread
+         │                          │                      │
+         │ lock(mutex)              │                      │
+         ├──────────────────────────►                      │
+         │ if (full)                │                      │
+         │   wait(not_full)         │                      │
+         │ push(item)               │                      │
+         │ notify(not_empty) ───────┼─────────────────────►│
+         │ unlock(mutex)            │                      │
+         │                          │ lock(mutex)          │
+         │                          ◄──────────────────────│
+         │                          │ if (empty)           │
+         │                          │   wait(not_empty)    │
+         │                          │ pop(item)            │
+         │ ◄─ notify(not_full) ─────┼─unlock(mutex)        │
+         │                          │                      │
+
+Key Synchronization Points:
+
+1. Producer waits on not_full if buffer is full
+2. When consumer removes item → notifies not_full
+3. Consumer waits on not_empty if buffer is empty
+4. When producer adds item → notifies not_empty
+5. All queue operations protected by mutex
 ```
 
 ## Key Components

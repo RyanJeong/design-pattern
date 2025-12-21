@@ -7,19 +7,91 @@ The ThreadPool pattern manages a collection of reusable worker threads that exec
 ## Structure
 
 ```text
-+--------------------------------------+ 
-|         ThreadPool (Manager)         |
-+--------------------------------------+
-|  Queue: [Task1] [Task2] [Task3] ... |
-+--------------------------------------+
-| +---------+ +---------+ +---------+ |
-| | Worker1 | | Worker2 | | Worker3 | |
-| | (Thread)| | (Thread)| | (Thread)| |
-| +----+----+ +----+----+ +----+----+ |
-|      |            |           |      |
-|      +------------+-----------+      |
-|         Gets tasks from queue        |
-+--------------------------------------+
+┌──────────────────────────────────────────┐
+│         ThreadPool                       │ ◄────── Thread Manager
+├──────────────────────────────────────────┤
+│ - workers: vector<thread>                │
+│ - tasks: queue<Task>                     │
+│ - mutex: mutex                           │
+│ - cv: condition_variable                 │
+│ - is_stopped: bool                       │
+├──────────────────────────────────────────┤
+│ + ThreadPool(num_workers: int)           │
+│ + Enqueue(task: Task): void              │
+│ + Stop(): void                           │
+│ # WorkerLoop(): void [private]           │
+└──────────────────────────────────────────┘
+         │ manages
+         │
+    ┌────┴────────────────────────────────┐
+    │                                     │
+┌─────────────┐            ┌────────────────┐
+│   Worker    │            │  Task Queue    │
+│  (Thread)   │            ├────────────────┤
+├─────────────┤            │ - tasks: [...] │
+│ - id        │            └────────────────┘
+│ - pool*     │
+├─────────────┤
+│ + Work()    │
+└─────────────┘
+
+┌──────────────────────┐
+│      Task            │ ◄────── Work Item
+├──────────────────────┤
+│ - func: function     │
+├──────────────────────┤
+│ + Execute(): void    │
+└──────────────────────┘
+
+Worker Thread Lifecycle:
+
+    ┌──────────────┐
+    │ Create       │
+    │ Threads      │
+    └──────┬───────┘
+           │
+    ┌──────v──────────────┐
+    │ Wait on Queue       │
+    │ (condition_variable)│
+    └──────┬──────────────┘
+           │
+    ┌──────v──────────────┐
+    │ Task Available?     │
+    └──────┬──────────────┘
+           │ Yes
+    ┌──────v──────────────┐
+    │ Dequeue Task        │
+    └──────┬──────────────┘
+           │
+    ┌──────v──────────────┐
+    │ Execute Task        │
+    └──────┬──────────────┘
+           │
+    ┌──────v──────────────┐
+    │ Loop to Wait        │◄──────┐
+    └─────────────────────┘       │
+                                  │
+                        (unless stopped)
+
+Task Processing Flow:
+
+    Enqueue(task)
+         │
+         v
+    ┌──────────────────┐
+    │ Task Queue       │
+    └────────┬─────────┘
+             │ cv.notify_one()
+             v
+    ┌──────────────────────┐
+    │ Worker Thread        │
+    │ (was waiting)        │
+    └────────┬─────────────┘
+             │
+             v
+    ┌──────────────────┐
+    │ Execute Task     │
+    └──────────────────┘
 ```
 
 ## Key Components
