@@ -23,9 +23,61 @@ The Iterator pattern is a behavioral design pattern that provides a way to acces
 ## Pattern Structure
 
 ```text
-Collection (abstract)    Iterator (abstract)
-     |                          |
-Concrete1 ----creates---- Concrete1Iterator
+┌────────────────────────────────┐
+│  Iterator (abstract)           │ ◄────── Abstract Iterator
+├────────────────────────────────┤
+│                                │
+├────────────────────────────────┤
+│ + HasNext(): bool              │
+│ + Next(): T                    │
+└────────────────────────────────┘
+         ▲
+         │ inherits
+         │
+┌───────────────────────────────────┐
+│ VectorIterator<T>                 │
+├───────────────────────────────────┤
+│ - collection: Collection<T>*      │
+│ - index: size_t                   │
+├───────────────────────────────────┤
+│ + HasNext(): bool                 │
+│ + Next(): T                       │
+└───────────────────────────────────┘
+
+┌──────────────────────────────────┐
+│  Collection (abstract)           │ ◄────── Abstract Collection
+├──────────────────────────────────┤
+│                                  │
+├──────────────────────────────────┤
+│ + CreateIterator(): Iterator     │
+│ + GetSize(): size_t              │
+│ + GetElement(int): T             │
+└──────────────────────────────────┘
+         ▲
+         │ inherits
+         │
+┌──────────────────────────────────────┐
+│ VectorCollection<T>                  │
+├──────────────────────────────────────┤
+│ - items: vector<T>                   │
+├──────────────────────────────────────┤
+│ + CreateIterator(): Iterator         │
+│ + GetSize(): size_t                  │
+│ + GetElement(i): T                   │
+│ + AddItem(item: T): void             │
+└──────────────────────────────────────┘
+         │ creates
+         └──────────> VectorIterator
+
+Usage:
+    Collection* col = new VectorCollection();
+    col->AddItem(1);
+    col->AddItem(2);
+    
+    Iterator* it = col->CreateIterator();
+    while(it->HasNext()) {
+        cout << it->Next() << endl;
+    }
 ```
 
 ### Components

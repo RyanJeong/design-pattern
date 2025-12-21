@@ -23,15 +23,56 @@ The Memento pattern is a behavioral design pattern that captures and saves the i
 ## Pattern Structure
 
 ```text
-Originator     Memento      Caretaker
-   |              |             |
-   +--creates---->+             |
-   +--restores---<+             |
-                                |
-                         +------+
-                         |stores
-                         v
-                      History
+┌──────────────────────────────┐
+│    Originator                │
+├──────────────────────────────┤
+│ - balance: int               │
+├──────────────────────────────┤
+│ + GetBalance(): int          │
+│ + Deposit(amount): void      │
+│ + Withdraw(amount): void     │
+│ + CreateMemento(): Memento   │
+│ + RestoreMemento(m): void    │
+└──────────────────────────────┘
+         │ creates
+         │ restores
+         v
+┌──────────────────────────────┐
+│    BankAccountMemento        │
+├──────────────────────────────┤
+│ - balance: int (immutable)   │
+├──────────────────────────────┤
+│ + GetBalance(): int          │
+└──────────────────────────────┘
+
+┌──────────────────────────────────┐
+│   Caretaker                      │
+├──────────────────────────────────┤
+│ - history: vector<Memento>       │
+│ - originator: BankAccount*       │
+├──────────────────────────────────┤
+│ + Backup(): void                 │
+│ + Undo(): void                   │
+│ + Redo(): void                   │
+│ + ShowHistory(): void            │
+└──────────────────────────────────┘
+
+Sequence:
+    Originator          Memento         Caretaker
+         │                               │
+         │ CreateMemento() ─────────────>│
+         │               ◄─ store        │
+         │                               │
+    State Changes
+         │
+         │ RestoreMemento() ◄──────────  │
+         │               (from stored)   │
+         │
+
+State History:
+    [Memento: 100]  ◄─── Backup 1
+    [Memento: 200]  ◄─── Backup 2
+    [Memento: 300]  ◄─── Backup 3  (current)
 ```
 
 ### Components

@@ -22,9 +22,45 @@ The Observer pattern is a behavioral design pattern that defines a one-to-many r
 ## Pattern Structure
 
 ```text
-Subject        Observer (abstract)
-   \              /          \
-    Concrete1  Concrete2
+┌────────────────────────────────────┐
+│           Observer                 │ ◄────── Abstract Observer
+├────────────────────────────────────┤
+│                                    │
+├────────────────────────────────────┤
+│ + OnPropertyChanged(change): ◆     │
+└────────────────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴──────────────────────────────┐
+    │                                   │
+┌─────────────────────────────┐  ┌────────────────────────────┐
+│ ConsoleObserver             │  │ LoggingObserver            │
+├─────────────────────────────┤  ├────────────────────────────┤
+│ - name: string              │  │ - name: string             │
+├─────────────────────────────┤  ├────────────────────────────┤
+│ + OnPropertyChanged(): void │  │ + OnPropertyChanged():void │
+└─────────────────────────────┘  └────────────────────────────┘
+
+┌─────────────────────────────────────────────────┐
+│              Person                             │ ◄────── Subject/Observable
+├─────────────────────────────────────────────────┤
+│ - name: string                                  │
+│ - age: int                                      │
+│ # observers: vector<shared_ptr<Observer>>       │
+├─────────────────────────────────────────────────┤
+│ + GetName(): string                             │
+│ + GetAge(): int                                 │
+│ + Subscribe(observer: shared_ptr): void         │
+│ + Unsubscribe(observer: shared_ptr): void       │
+│ + SetAge(age: int): void                        │
+│ # NotifyObservers(change: PropertyChange): void │
+└─────────────────────────────────────────────────┘
+         │
+         └──► notifies ◄──┐
+              all         │
+         Observers        │
+              ▲           │
+              └───────────┘
 ```
 
 ### Components

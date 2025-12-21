@@ -23,10 +23,50 @@ The Template Method pattern is a behavioral design pattern that defines the skel
 ## Pattern Structure
 
 ```text
-      Game (abstract)
-      /              \
-   Chess          Checkers
-  (concrete)      (concrete)
+┌────────────────────────────────────────┐
+│        Game (abstract)                 │ ◄────── Abstract Base Class
+├────────────────────────────────────────┤
+│                                        │
+├────────────────────────────────────────┤
+│ + Play(): void                         │ ◄── Template Method
+│ # Start(): void = 0                    │ ◄── Hook Methods
+│ # TakeTurn(): void = 0                 │     (abstract)
+│ # HaveWinner(): bool = 0               │
+│ # End(): void = 0                      │
+└────────────────────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴──────────────────────────┐
+    │                               │
+┌───────────────────────────┐  ┌──────────────────────┐
+│ Chess                     │  │ Checkers             │
+├───────────────────────────┤  ├──────────────────────┤
+│ - players_count: int      │  │ - players_count: int │
+│ - current_player: int     │  │ - current_player: int│
+├───────────────────────────┤  ├──────────────────────┤
+│ # Start(): void           │  │ # Start(): void      │
+│ # TakeTurn(): void        │  │ # TakeTurn(): void   │
+│ # HaveWinner(): bool      │  │ # HaveWinner(): bool │
+│ # End(): void             │  │ # End(): void        │
+└───────────────────────────┘  └──────────────────────┘
+
+Template Method (Play) Flow:
+    ┌─────────────────┐
+    │  Play()         │ (Final)
+    └────────┬────────┘
+             │
+    ┌────────v─────────┐
+    │  Start()         │ (hook override)
+    └────────┬─────────┘
+             │
+    ┌────────v─────────────────┐
+    │  while(!HaveWinner())    │
+    │    TakeTurn()            │ (hook override)
+    └────────┬─────────────────┘
+             │
+    ┌────────v─────────┐
+    │  End()           │ (hook override)
+    └──────────────────┘
 ```
 
 ### Components

@@ -23,11 +23,51 @@ The Visitor pattern is a behavioral design pattern that represents an operation 
 ## Pattern Structure
 
 ```text
-  Element (abstract)         Visitor (abstract)
-  /                \         /                \
-Concrete1     Concrete2   Concrete1V      Concrete2V
-  \             /             /              /
-   \___accept__/             /___visit_____/
+┌────────────────────────────────┐
+│      Element                   │ ◄────── Abstract Element
+├────────────────────────────────┤
+│                                │
+├────────────────────────────────┤
+│ + Accept(visitor): ◆           │
+└────────────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴──────────────────────────┐
+    │                               │
+┌──────────────────┐  ┌──────────────────────┐
+│ Literal          │  │ BinaryOp             │
+├──────────────────┤  ├──────────────────────┤
+│ - value: int     │  │ - op: char           │
+├──────────────────┤  │ - left: unique_ptr   │
+│ + Accept(): void │  │ - right: unique_ptr  │
+└──────────────────┘  ├──────────────────────┤
+                      │ + Accept(): void     │
+                      └──────────────────────┘
+
+┌──────────────────────────────────┐
+│   ExpressionVisitor              │ ◄────── Abstract Visitor
+├──────────────────────────────────┤
+│                                  │
+├──────────────────────────────────┤
+│ + Visit(Literal): ◆              │
+│ + Visit(BinaryOp): ◆             │
+└──────────────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴─────────────────────────────┐
+    │                                  │
+┌─────────────────────────┐  ┌────────────────────────┐
+│ PrintVisitor            │  │ EvalVisitor            │
+├─────────────────────────┤  ├────────────────────────┤
+│                         │  │                        │
+├─────────────────────────┤  ├────────────────────────┤
+│ + Visit(Literal): void  │  │ + Visit(Literal): int  │
+│ + Visit(BinaryOp): void │  │ + Visit(BinaryOp): int │
+└─────────────────────────┘  └────────────────────────┘
+
+Relationship:
+    Element  ◄─── Accept(visitor) ───► Visitor
+                   (double dispatch)
 ```
 
 ### Components

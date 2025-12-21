@@ -22,11 +22,39 @@ The State pattern is a behavioral design pattern that allows an object to alter 
 ## Pattern Structure
 
 ```text
-     Context
-       |
-    State (abstract)
-    /        \
-OnState    OffState
+┌──────────────────────────────────┐
+│        State                     │ ◄────── Abstract State
+├──────────────────────────────────┤
+│                                  │
+├──────────────────────────────────┤
+│ + On(context): shared_ptr<State> │
+│ + Off(context): shared_ptr<State>│
+└──────────────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴─────────────────────────┐
+    │                              │
+┌────────────────────┐  ┌──────────────────┐
+│ OnState            │  │ OffState         │
+├────────────────────┤  ├──────────────────┤
+│                    │  │                  │
+├────────────────────┤  ├──────────────────┤
+│ + On(): State      │  │ + On(): State    │
+│ + Off(): State     │  │ + Off(): State   │
+└────────────────────┘  └──────────────────┘
+
+┌──────────────────────────────────────┐
+│       LightSwitch                    │ ◄────── Context
+├──────────────────────────────────────┤
+│ - state: shared_ptr<State>           │
+├──────────────────────────────────────┤
+│ + SetState(state: shared_ptr): void  │
+│ + GetState(): shared_ptr<State>      │
+│ + On(): void                         │
+│ + Off(): void                        │
+└──────────────────────────────────────┘
+         │ uses
+         └──────────► State object
 ```
 
 ### Components

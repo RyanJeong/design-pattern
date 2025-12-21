@@ -23,10 +23,51 @@ The Interpreter pattern is a behavioral design pattern that defines a grammatica
 ## Pattern Structure
 
 ```text
-    Expression (abstract)
-    /              \
-Terminal        NonTerminal
-Number          Add, Subtract, etc.
+┌───────────────────────────────┐
+│     Expression                │ ◄────── Abstract Expression
+├───────────────────────────────┤
+│                               │
+├───────────────────────────────┤
+│ + Interpret(): int            │
+└───────────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴─────────────────────────────────────┐
+    │                                          │
+┌────────────────────┐  ┌────────────────────────┐
+│ Number             │  │ Add                    │
+│(Terminal)          │  │(NonTerminal)           │
+├────────────────────┤  ├────────────────────────┤
+│ - value: int       │  │ - left: unique_ptr     │
+├────────────────────┤  │ - right: unique_ptr    │
+│ + Interpret(): int │  ├────────────────────────┤
+│                    │  │ + Interpret(): int     │
+└────────────────────┘  └────────────────────────┘ 
+                      
+┌────────────────────────────────────────────┐
+│ Subtract, Multiply, Divide                 │
+│ (Other NonTerminal Expressions)            │
+├────────────────────────────────────────────┤
+│ - left: unique_ptr<Expression>             │
+│ - right: unique_ptr<Expression>            │
+├────────────────────────────────────────────┤
+│ + Interpret(): int                         │
+└────────────────────────────────────────────┘
+
+Expression Tree Example:
+        ┌─────────┐
+        │   Add   │
+        └────┬────┘
+           /   \
+          /     \
+      ┌──────┐ ┌──────────┐
+      │ Num:5│ │ Multiply │
+      └──────┘ └────┬─────┘
+                   / \
+                  /   \
+             ┌──────┐ ┌──────┐
+             │ Num:3│ │ Num:2│
+             └──────┘ └──────┘
 ```
 
 ### Components

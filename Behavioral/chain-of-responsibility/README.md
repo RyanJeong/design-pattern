@@ -22,9 +22,46 @@ The Chain of Responsibility pattern is a behavioral design pattern that lets you
 ## Pattern Structure
 
 ```text
-      Handler
-    /        \
-  Concrete1  Concrete2
+┌─────────────────────────┐
+│      Modifier           │ ◄────── Abstract Handler
+├─────────────────────────┤
+│  # next: shared_ptr     │
+├─────────────────────────┤
+│  + Handle(creature): ◆  │
+└─────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴─────────────────────────────────┐
+    │                                      │
+┌───────────────────────────────┐  ┌──────────────────────────────────┐
+│ DoubleAttackModifier          │  │ IncreaseDefenseModifier          │
+├───────────────────────────────┤  ├──────────────────────────────────┤
+│ - next: shared_ptr<Modifier>  │  │ - next: shared_ptr<Modifier>     │
+├───────────────────────────────┤  ├──────────────────────────────────┤
+│ + Handle(creature): Creature  │  │ + Handle(creature): Creature     │
+└───────────────────────────────┘  └──────────────────────────────────┘
+
+┌──────────────────────────────┐
+│ NoBonusesModifier            │
+├──────────────────────────────┤
+│ - next: shared_ptr<Modifier> │
+├──────────────────────────────┤
+│ + Handle(creature): Creature │
+└──────────────────────────────┘
+
+┌──────────────────────────────┐
+│      Creature                │ ◄────── Client Object
+├──────────────────────────────┤
+│ - name: string               │
+│ - attack: int                │
+│ - defense: int               │
+├──────────────────────────────┤
+│ + GetName(): string          │
+│ + GetAttack(): int           │
+│ + GetDefense(): int          │
+│ + WithAttack(int): Creature  │
+│ + WithDefense(int): Creature │
+└──────────────────────────────┘
 ```
 
 ### Components

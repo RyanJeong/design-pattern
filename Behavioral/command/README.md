@@ -23,11 +23,46 @@ The Command pattern is a behavioral design pattern that encapsulates a request a
 ## Pattern Structure
 
 ```text
-    Command (abstract)
-    /              \
-Concrete1      Concrete2
-    \              /
-    Invoker (manages history)
+┌──────────────────────────┐
+│      Command             │ ◄────── Abstract Command
+├──────────────────────────┤
+│                          │
+├──────────────────────────┤
+│  + Execute(): ◆          │
+│  + Undo(): ◆             │
+└──────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴──────────────────────────┐
+    │                               │
+┌───────────────────────────────┐  ┌──────────────────────────────┐
+│ DepositCommand                │  │ WithdrawCommand              │
+├───────────────────────────────┤  ├──────────────────────────────┤
+│ - account: BankAccount        │  │ - account: BankAccount       │
+│ - amount: int                 │  │ - amount: int                │
+├───────────────────────────────┤  ├──────────────────────────────┤
+│ + Execute(): void             │  │ + Execute(): void            │
+│ + Undo(): void                │  │ + Undo(): void               │
+└───────────────────────────────┘  └──────────────────────────────┘
+
+┌────────────────────────────────────────┐
+│      CommandInvoker                    │ ◄────── Invoker/Manager
+├────────────────────────────────────────┤
+│ - history: vector<unique_ptr<Command>> │
+├────────────────────────────────────────┤
+│ + Invoke(command): void                │
+│ + Undo(): void                         │
+└────────────────────────────────────────┘
+         │ manages
+         └──────► uses ┌──────────────────────┐
+                       │   BankAccount        │ ◄────── Receiver
+                       ├──────────────────────┤
+                       │ - balance: int       │
+                       ├──────────────────────┤
+                       │ + Deposit(int): void │
+                       │ + Withdraw(int): void│
+                       │ + GetBalance(): int  │
+                       └──────────────────────┘
 ```
 
 ### Components

@@ -23,13 +23,59 @@ The Mediator pattern is a behavioral design pattern that defines an object that 
 ## Pattern Structure
 
 ```text
-      Mediator (abstract)
-           |
-      ChatRoom
-           |
-    Colleague (abstract)
-    /      |      \
-User1   User2   User3
+┌──────────────────────────────┐
+│    Mediator (abstract)       │ ◄────── Abstract Mediator
+├──────────────────────────────┤
+│                              │
+├──────────────────────────────┤
+│ + RegisterColleague(c): ◆    │
+│ + Send(msg, from, to): ◆     │
+└──────────────────────────────┘
+         ▲
+         │ inherits
+         │
+┌────────────────────────────────┐
+│      ChatRoom                  │
+├────────────────────────────────┤
+│ - users: vector<unique_ptr>    │
+├────────────────────────────────┤
+│ + RegisterColleague(user): void│
+│ + Send(msg, from, to): void    │
+│ + Display(): void              │
+└────────────────────────────────┘
+         ▲
+         │ coordinates
+         │
+    ┌────┴──────────────────────────────┐
+    │                                   │
+┌────────────────────────────┐  ┌─────────────────────────┐
+│ Colleague (abstract)       │  │                         │
+├────────────────────────────┤  │ (Concrete Colleagues)   │
+│ # mediator: Mediator*      │  │                         │
+│ # name: string             │  │ - ChatRoom*             │
+├────────────────────────────┤  │ - name: string          │
+│ + Send(msg, to): void      │  │ + Send(msg, to): void   │
+│ + Receive(msg, from): void │  └─────────────────────────┘
+└────────────────────────────┘
+         ▲
+         │ inherits
+         │
+      User
+    + Receive(msg): void
+
+Relationship:
+   ┌──────────┐       ┌──────────┐
+   │  User 1  │       │  User 2  │
+   └────┬─────┘       └────┬─────┘
+        │                  │
+        └──────┬───────────┘
+               │ communicate
+               │ through
+               v
+        ┌─────────────┐
+        │  ChatRoom   │
+        │  (Mediator) │
+        └─────────────┘
 ```
 
 ### Components

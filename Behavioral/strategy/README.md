@@ -23,11 +23,41 @@ The Strategy pattern is a behavioral design pattern that defines a family of alg
 ## Pattern Structure
 
 ```text
-    Strategy (abstract)
-    /              \
-Concrete1      Concrete2
-    \              /
-    Context (uses strategy)
+┌─────────────────────────────┐
+│    ListStrategy             │ ◄────── Abstract Strategy
+├─────────────────────────────┤
+│                             │
+├─────────────────────────────┤
+│ + FormatStart(): string     │
+│ + FormatEnd(): string       │
+│ + FormatItem(item): string  │
+└─────────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴────────────────────────────────────┐
+    │                                         │
+┌───────────────────────────┐  ┌────────────────────────────┐
+│ MarkdownListStrategy      │  │ HtmlListStrategy           │
+├───────────────────────────┤  ├────────────────────────────┤
+│                           │  │                            │
+├───────────────────────────┤  ├────────────────────────────┤
+│ + FormatItem(item): string│  │ + FormatStart(): string    │
+│                           │  │ + FormatEnd(): string      │
+│                           │  │ + FormatItem(item): string │
+└───────────────────────────┘  └────────────────────────────┘
+
+┌──────────────────────────────────────────┐
+│        TextProcessor                     │ ◄────── Context
+├──────────────────────────────────────────┤
+│ - strategy: unique_ptr<ListStrategy>     │
+│ - items: vector<string>                  │
+├──────────────────────────────────────────┤
+│ + AddItem(item: string): void            │
+│ + SetStrategy(strategy: unique_ptr): void│
+│ + ToString(): string                     │
+└──────────────────────────────────────────┘
+         │ uses
+         └──────────► Strategy object
 ```
 
 ### Components
