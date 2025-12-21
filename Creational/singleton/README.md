@@ -12,14 +12,34 @@ The **Singleton Pattern** ensures that a class has only one instance and provide
 
 ## Structure
 
-```
------------------
-|  Singleton     |
-|----------------|
-| - instance     |
-|----------------|
-| + getInstance()|
------------------
+```text
+┌─────────────────────────────────────┐
+│      Logger                         │ (Singleton)
+├─────────────────────────────────────┤
+│ - instance: static Logger           │
+├─────────────────────────────────────┤
+│ - Logger() [private]                │ ◄── Private Constructor
+│ - Logger(const Logger&) = delete    │ ◄── Delete Copy Constructor
+│ - operator=(const Logger&) = delete │ ◄── Delete Assignment
+├─────────────────────────────────────┤
+│ + GetInstance(): Logger&            │ ◄── Static Access Point
+│ + Log(msg: string): void            │
+└─────────────────────────────────────┘
+
+Thread-safe Implementation:
+    
+    static Logger& GetInstance() {
+        static Logger instance;  ◄── Created once (C++11+)
+        return instance;         ◄── Thread-safe
+    }
+
+Usage:
+    Logger& logger = Logger::GetInstance();
+    logger.Log("Starting application");
+    
+    // Same instance everywhere:
+    Logger& logger2 = Logger::GetInstance();
+    // logger and logger2 refer to the same object
 ```
 
 ## Implementation Details

@@ -13,37 +13,81 @@ The **Factory Method Pattern** defines an interface for creating objects in a su
 
 ## Structure
 
-```
-----------------------
-|  Document           | (Abstract Product)
-|---------------------|
-| + open()            |
-| + save()            |
-| + close()           |
----------------------+
-             ^
-             |
-     +---+------+ +---------+
-     |          | |         |
- +------+ +--------+ +--------+
- | PDF  | | Word   | | Text   |
- | Doc  | | Doc    | | Doc    |
- +------+ +--------+ +--------+
+```text
+┌────────────────────────────────────┐
+│         Document                   │ ◄────── Abstract Product
+├────────────────────────────────────┤
+│                                    │
+├────────────────────────────────────┤
+│ + Open(): void = 0                 │
+│ + Save(): void = 0                 │
+│ + Close(): void = 0                │
+└────────────────────────────────────┘
+               ▲
+               │ inherits
+    ┌──────────┼──────────────────────────┐
+    │          │                          │
+┌──────────┐  ┌────────────┐  ┌─────────────┐
+│ PDFDoc   │  │ WordDoc    │  │  TextDoc    │
+├──────────┤  ├────────────┤  ├─────────────┤
+│          │  │            │  │             │
+├──────────┤  ├────────────┤  ├─────────────┤
+│ + Open() │  │ + Open()   │  │ + Open()    │
+│ + Save() │  │ + Save()   │  │ + Save()    │
+│ + Close()│  │ + Close()  │  │ + Close()   │
+└──────────┘  └────────────┘  └─────────────┘
 
-------------------------
-| Application          | (Abstract Creator)
-|----------------------|
-| + create_document()  |
-| + new_document()     |
-----------------------+
-             ^
-             |
-     +---+-----+ +--------+ +--------+
-     |         | |        | |        |
- +--------+ +--------+ +--------+
- | PDF    | | Word   | | Text   |
- | App    | | App    | | App    |
- +--------+ +--------+ +--------+
+
+┌─────────────────────────────────┐
+│      Application                │ ◄────── Abstract Creator
+├─────────────────────────────────┤
+│                                 │
+├─────────────────────────────────┤
+│ + CreateDocument(): Document ◆  │ ◄── Factory Method (abstract)
+│ + NewDocument(): void           │
+│ + OpenFile(doc): void           │
+└─────────────────────────────────┘
+                              ▲
+                              │ inherits
+    ┌─────────────────────────┼──────────────────────────┐
+    │                         │                          │
+┌────────────────────────┐┌─────────────────────────┐┌─────────────────────────┐
+│ PDFApplication         ││ WordApplication         ││ TextApplication         │
+├────────────────────────┤├─────────────────────────┤├─────────────────────────┤
+│                        ││                         ││                         │
+├────────────────────────┤├─────────────────────────┤├─────────────────────────┤
+│ + CreateDocument():    ││ + CreateDocument():     ││ + CreateDocument():     │
+│   Document ◆           ││   Document ◆            ││   Document ◆            │
+│   {                    ││   {                     ││   {                     │
+│     return new PDFDoc()││     return new WordDoc()││     return new TextDoc()│
+│   }                    ││   }                     ││   }                     │
+└────────────────────────┘└─────────────────────────┘└─────────────────────────┘
+
+Factory Method Pattern - Client Usage:
+
+    Application* app;
+    
+    if (type == "PDF")
+        app = new PDFApplication();
+    else if (type == "Word")
+        app = new WordApplication();
+    else
+        app = new TextApplication();
+    
+    Document* doc = app->CreateDocument();  ◄── Factory method called
+    doc->Open();
+    doc->Save();
+    doc->Close();
+
+Key Relationships:
+
+    PDFApplication ◄────── inherits ────── Application
+    WordApplication ◄────── inherits ────── Application
+    TextApplication ◄────── inherits ────── Application
+    
+    PDFApplication creates ─────► PDFDoc (implements Document)
+    WordApplication creates ──► WordDoc (implements Document)
+    TextApplication creates ──► TextDoc (implements Document)
 ```
 
 ## Implementation Details

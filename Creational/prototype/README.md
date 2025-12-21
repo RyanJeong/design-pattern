@@ -14,28 +14,61 @@ The **Prototype Pattern** creates new objects by copying an existing object (pro
 
 ## Structure
 
-```
--------------------
-|    Shape         | (Prototype Interface)
-|------------------|
-| + clone()        |
-| + display()      |
-------------------+
-       ^
-       |
-   +---+----+
-   |        |
- +--------+ +----------+
- | Circle | |Rectangle |
- +--------+ +----------+
+```text
+┌───────────────────────────────┐
+│      Shape                    │ ◄────── Prototype Interface
+├───────────────────────────────┤
+│ - x: int                      │
+│ - y: int                      │
+├───────────────────────────────┤
+│ + Clone(): unique_ptr = 0     │
+│ + Display(): void = 0         │
+└───────────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴──────────────────┐
+    │                       │
+┌──────────────┐  ┌──────────────────┐
+│ Circle       │  │ Rectangle        │
+├──────────────┤  ├──────────────────┤
+│ - radius: int│  │ - width: int     │
+│              │  │ - height: int    │
+├──────────────┤  ├──────────────────┤
+│ + Clone():   │  │ + Clone():       │
+│   unique_ptr │  │   unique_ptr     │
+│ + Display()  │  │ + Display()      │
+└──────────────┘  └──────────────────┘
 
----------------------
-| ShapeRegistry      |
-|--------------------|
-| - prototypes       |
-| + register()       |
-| + create_shape()   |
----------------------
+┌──────────────────────────────────────┐
+│    ShapeRegistry                     │ ◄────── Prototype Registry
+├──────────────────────────────────────┤
+│ - prototypes:                        │
+│   map<string, unique_ptr<Shape>>     │
+├──────────────────────────────────────┤
+│ + RegisterPrototype(                 │
+│     key: string,                     │
+│     shape: unique_ptr): void         │
+│                                      │
+│ + CreateShape(key: string):          │
+│   unique_ptr<Shape>                  │
+│   {                                  │
+│     return prototypes[key]->Clone()  │
+│   }                                  │
+└──────────────────────────────────────┘
+
+Clone Process:
+
+    Prototype Pattern Advantages:
+    
+    Shape* original = new Circle(50, 50, 20);
+    Shape* clone1 = original->Clone();  ◄── No need for subclass knowledge
+    Shape* clone2 = original->Clone();  ◄── Creates independent copies
+    
+    ShapeRegistry registry;
+    registry.RegisterPrototype("circle", 
+                              make_unique<Circle>(0, 0, 5));
+    
+    auto shape = registry.CreateShape("circle");  ◄── Clones from registry
 ```
 
 ## Implementation Details

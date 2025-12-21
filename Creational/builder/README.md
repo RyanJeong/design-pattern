@@ -14,31 +14,65 @@ The **Builder Pattern** separates the construction of a complex object from its 
 ## Structure
 
 ```text
------------------------
-|     Computer         | (Product)
-|----------------------|
-| - cpu                |
-| - ram                |
-| - storage            |
-| - gpu                |
------------------------
-      ^
-      |
------------------------
-| ComputerBuilder      | (Abstract Builder)
-|----------------------|
-| + set_cpu()          |
-| + set_ram()          |
-| + build()            |
------------------------
-      ^
-      |
-    +----+----+
-    |         |
- +---------+ +-------------+
- | Gaming  | | Workstation |
- | Builder | | Builder     |
- +---------+ +-------------+
+┌──────────────────────────────┐
+│      Computer                │ ◄────── Product
+├──────────────────────────────┤
+│ - cpu: string                │
+│ - ram: string                │
+│ - storage: string            │
+│ - gpu: string                │
+├──────────────────────────────┤
+│ + GetCPU(): string           │
+│ + GetRAM(): string           │
+│ + GetStorage(): string       │
+│ + GetGPU(): string           │
+└──────────────────────────────┘
+
+┌────────────────────────────────┐
+│   ComputerBuilder              │ ◄────── Abstract Builder
+├────────────────────────────────┤
+│ # computer: Computer           │
+├────────────────────────────────┤
+│ + SetCPU(cpu): Builder&        │
+│ + SetRAM(ram): Builder&        │
+│ + SetStorage(storage): Builder&│
+│ + SetGPU(gpu): Builder&        │
+│ + Build(): Computer            │
+└────────────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴──────────────────────────────┐
+    │                                   │
+┌────────────────────────────┐  ┌──────────────────────────┐
+│ GamingComputerBuilder      │  │WorkstationComputerBuilder│
+├────────────────────────────┤  ├──────────────────────────┤
+│ - computer: Computer       │  │ - computer: Computer     │
+├────────────────────────────┤  ├──────────────────────────┤
+│ + SetCPU(...): Builder&    │  │ + SetCPU(...): Builder&  │
+│   (Gaming CPU)             │  │   (Workstation CPU)      │
+│ + SetRAM(...): Builder&    │  │ + SetRAM(...): Builder&  │
+│   (High RAM)               │  │   (High RAM)             │
+│ + SetStorage(...): Builder&│  │ + SetStorage(...):Builder│
+│   (High-speed SSD)         │  │   (Enterprise storage)   │
+│ + SetGPU(...): Builder&    │  │ + SetGPU(...): Builder&  │
+│   (Gaming GPU)             │  │   (Professional GPU)     │
+│ + Build(): Computer        │  │ + Build(): Computer      │
+└────────────────────────────┘  └──────────────────────────┘
+
+Fluent Interface (Method Chaining):
+
+    GamingComputerBuilder builder;
+    Computer pc = builder
+        .SetCPU("Intel Core i9-13900K")
+        .SetRAM("64GB DDR5")
+        .SetStorage("2TB NVMe SSD")
+        .SetGPU("RTX 4090")
+        .Build();
+
+Step-by-step Construction:
+    
+    Builder Step 1 ─► Builder Step 2 ─► Builder Step 3 ─► Builder Step 4 ─► Build()
+    (SetCPU)         (SetRAM)          (SetStorage)       (SetGPU)          (Product)
 ```
 
 ## Implementation Details

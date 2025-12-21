@@ -14,30 +14,79 @@ The **Abstract Factory Pattern** provides an interface for creating families of 
 ## Structure
 
 ```text
--------------------------------
-|         UIFactory           | (Abstract Factory)
-|-----------------------------|
-| + CreateButton()            |
-| + CreateCheckbox()          |
--------------------------------
-  ^                ^
-  |                |
- +----------+     +----------+
- | Windows  |     | Mac      |
- | Factory  |     | Factory  |
- +----------+     +----------+
-  |                |
-  +----+-----------+
-       |
-     +---------------------+
-     | Button Checkbox     |
-     | (Abstract Products) |
-     +---------------------+
-       |            |
-+-----------+      +----------+
-| (Windows) |      | (Mac)    |
-| Products  |      | Products |
-+-----------+      +----------+
+┌──────────────────────────────────┐
+│      UIFactory                   │ ◄────── Abstract Factory
+├──────────────────────────────────┤
+│                                  │
+├──────────────────────────────────┤
+│ + CreateButton(): Button = 0     │
+│ + CreateCheckbox(): Checkbox = 0 │
+└──────────────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴─────────────────────┐
+    │                          │
+┌──────────────────┐  ┌────────────────────┐
+│ WindowsFactory   │  │ MacFactory         │
+├──────────────────┤  ├────────────────────┤
+│                  │  │                    │
+├──────────────────┤  ├────────────────────┤
+│ + CreateButton() │  │ + CreateButton()   │
+│   {return        │  │   {return          │
+│      WindowsBtn} │  │      MacButton}    │
+│                  │  │                    │
+│ + CreateCheckbox │  │ + CreateCheckbox() │
+│   {return        │  │   {return          │
+│     WindowsChkbx}│  │     MacCheckbox}   │
+└──────────────────┘  └────────────────────┘
+    │                  │
+    │ creates          │ creates
+    v                  v
+┌─────────────────────────┐
+│     Button              │ ◄────── Abstract Product Family 1
+├─────────────────────────┤
+│ + Paint(): void = 0     │
+└─────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴──────────────┐
+    │                   │
+┌─────────────┐  ┌────────────┐
+│WindowsButton│  │ MacButton  │
+├─────────────┤  ├────────────┤
+│             │  │            │
+├─────────────┤  ├────────────┤
+│ + Paint()   │  │ + Paint()  │
+└─────────────┘  └────────────┘
+
+┌─────────────────────────┐
+│    Checkbox             │ ◄────── Abstract Product Family 2
+├─────────────────────────┤
+│ + Paint(): void = 0     │
+└─────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴─────────────────┐
+    │                      │
+┌──────────────┐  ┌──────────────┐
+│WindowsChkbx  │  │ MacCheckbox  │
+├──────────────┤  ├──────────────┤
+│              │  │              │
+├──────────────┤  ├──────────────┤
+│ + Paint()    │  │ + Paint()    │
+└──────────────┘  └──────────────┘
+
+Product Family Consistency:
+    
+    UIFactory* factory;
+    if (is_windows)
+      factory = new WindowsFactory();
+    else
+      factory = new MacFactory();
+    
+    Button* btn = factory->CreateButton();      ◄── Windows Button
+    Checkbox* chk = factory->CreateCheckbox();  ◄── Windows Checkbox
+                                                   (Same family)
 ```
 
 ## Implementation Details
