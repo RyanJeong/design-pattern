@@ -14,33 +14,85 @@ The **Bridge Pattern** decouples an object's abstraction from its implementation
 ## Structure
 
 ```text
-+-----------------+
-|     Shape       | (Abstraction)
-|-----------------|
-| - renderer      |
-+-----------------+
-       ^
-       |
-   +---+----+
-   |        |
- +--------+ +----------+
- | Circle | |Rectangle | (Refined Abstractions)
- +--------+ +----------+
+┌─────────────────────────────────┐
+│        Shape                    │ ◄────── Abstraction
+├─────────────────────────────────┤
+│ # renderer: shared_ptr<Renderer>│
+├─────────────────────────────────┤
+│ # Shape(renderer: shared_ptr)   │
+│ + Draw(): void = 0              │
+│ + Resize(pct): void = 0         │
+└─────────────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴──────────────────────┐
+    │                           │
+┌──────────────────┐  ┌──────────────────┐
+│ Circle           │  │ Rectangle        │
+│(Refined          │  │(Refined          │
+│Abstraction)      │  │Abstraction)      │
+├──────────────────┤  ├──────────────────┤
+│ - radius: int    │  │ - width: int     │
+│ - height: int    │  │ - height: int    │
+├──────────────────┤  ├──────────────────┤
+│ + Draw(): void   │  │ + Draw(): void   │
+│   {renderer->    │  │   {renderer->    │
+│   RenderCircle()}│  │   RenderRect()}  │
+│ + Resize(pct)    │  │ + Resize(pct)    │
+└──────────────────┘  └──────────────────┘
+         │                    │
+         │ uses               │ uses
+         └────────┬───────────┘
+                  │
+                  v
+    ┌──────────────────────────┐
+    │    Renderer              │ ◄────── Implementer
+    ├──────────────────────────┤
+    │ + RenderCircle(): void=0 │
+    │ + RenderRect(): void=0   │
+    └──────────────────────────┘
+              ▲
+              │ implements
+         ┌────┴──────────────────┐
+         │                       │
+    ┌───────────────┐  ┌──────────────────┐
+    │VectorRenderer │  │RasterRenderer    │
+    │(Concrete      │  │(Concrete         │
+    │Implementer)   │  │Implementer)      │
+    ├───────────────┤  ├──────────────────┤
+    │               │  │                  │
+    ├───────────────┤  ├──────────────────┤
+    │RenderCircle() │  │RenderCircle()    │
+    │  (vector way) │  │  (raster way)    │
+    │RenderRect()   │  │RenderRect()      │
+    │  (vector way) │  │  (raster way)    │
+    └───────────────┘  └──────────────────┘
 
- +------------------+
- |   Renderer       | (Implementer)
- |------------------|
- | + RenderCircle() |
- | + RenderRect()   |
- +------------------+
-       ^
-       |
-   +---+----+
-   |        |
- +------------+ +--------------+
- | Vector     | | Raster       |
- | Renderer   | | Renderer     |
- +------------+ +--------------+
+Bridge Pattern Concept:
+
+    ┌─────────────────────────────┐
+    │       Abstraction           │
+    │   (Shape Hierarchy)         │
+    └────────────┬────────────────┘
+                 │
+        ┌────────┴────────┐
+        │  Implementation │
+        │    Bridge       │
+        └────────┬────────┘
+                 │
+    ┌────────────v────────────┐
+    │    Implementation       │
+    │   (Renderer Hierarchy)  │
+    └─────────────────────────┘
+
+Runtime Flexibility:
+
+    Shape* circle = new Circle(new RasterRenderer());
+    circle->Draw();  // Uses raster
+    
+    circle = new Circle(new VectorRenderer());
+    circle->Draw();  // Uses vector
+                     (without changing Shape code!)
 ```
 
 ## Implementation Details

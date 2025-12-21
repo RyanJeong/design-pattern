@@ -14,28 +14,92 @@ The **Decorator Pattern** attaches additional responsibilities to an object dyna
 ## Structure
 
 ```text
-+--------------+
-|  Component   | (Base Interface)
-|--------------|
-| + Operation()|
-+--------------+
-     ^
-     |
-   +---+----------+
-   |              |
- +---------+ +--------------+
- | Simple  | |  Decorator   |
- |Component| |--------------|
- +---------+ | - component  |
-             | + Operation()|
-             +--------------+
-                ^
-                |
-               +----+----+--------+-----------+
-               |         |        |           |
-             +--------+ +------+ +---------+ +-------+
-             | Milk   | | Sugar| |Chocolate| | ...   |
-             +--------+ +------+ +---------+ +-------+
+┌─────────────────────────────┐
+│     Component               │ ◄────── Abstract Component
+├─────────────────────────────┤
+│                             │
+├─────────────────────────────┤
+│ + GetDescription(): string  │
+│ + GetCost(): double = 0     │
+│ + Operation(): void = 0     │
+└─────────────────────────────┘
+         ▲
+         │ implements
+    ┌────┴──────────────────────┐
+    │                           │
+┌──────────────────┐  ┌──────────────────────┐
+│ SimpleCoffee     │  │ CoffeeDecorator      │
+│(Concrete         │  │(Decorator Base)      │
+│Component)        │  ├──────────────────────┤
+├──────────────────┤  │ # component:         │
+│                  │  │   unique_ptr         │
+├──────────────────┤  ├──────────────────────┤
+│GetDescription(): │  │ GetDescription():    │
+│  "Coffee"        │  │   inherited from     │
+│GetCost(): 5.0    │  │   component          │
+│Operation()       │  │ GetCost(): double=0  │
+└──────────────────┘  │ Operation(): void=0  │
+                      └──────────────────────┘
+                               ▲
+                               │ inherits
+           ┌───────────────────┼─────────────────────┐
+           │                   │                     │
+    ┌─────────────┐  ┌──────────────┐  ┌───────────────┐
+    │MilkDecorator│  │SugarDecorator│  │ChocolateDecor │
+    ├─────────────┤  ├──────────────┤  ├───────────────┤
+    │ - component │  │ - component  │  │ - component   │
+    ├─────────────┤  ├──────────────┤  ├───────────────┤
+    │GetDescr():  │  │GetDescr():   │  │GetDescr():    │
+    │ component + │  │ component +  │  │ component +   │
+    │ " + Milk"   │  │ " + Sugar"   │  │ " + Chocolate"│
+    │GetCost():   │  │GetCost():    │  │GetCost():     │
+    │ comp + 2.0  │  │ comp + 1.5   │  │ comp + 3.0    │
+    └─────────────┘  └──────────────┘  └───────────────┘
+
+Stacking Decorators (Composition):
+
+    ┌───────────────────────────────┐
+    │ ChocolateDecorator            │
+    │ "Coffee + Milk + Sugar +      │
+    │  Chocolate"  (Cost: 12.5)     │
+    │ component ────►               │
+    └───────────────┬───────────────┘
+                    │
+              ┌─────v─────────────────┐
+              │ SugarDecorator        │
+              │ "Coffee + Milk +      │
+              │  Sugar"  (Cost: 9.5)  │
+              │ component ────►       │
+              └──────┬────────────────┘
+                     │
+               ┌─────v───────────────┐
+               │ MilkDecorator       │
+               │ "Coffee + Milk"     │
+               │ (Cost: 7.0)         │
+               │ component ────►     │
+               └──────┬──────────────┘
+                      │
+                ┌─────v──────────┐
+                │ SimpleCoffee   │
+                │ "Coffee"       │
+                │ (Cost: 5.0)    │
+                └────────────────┘
+
+Usage Example:
+
+    auto coffee = make_unique<ChocolateDecorator>(
+        make_unique<SugarDecorator>(
+            make_unique<MilkDecorator>(
+                make_unique<SimpleCoffee>())));
+    
+    cout << coffee->GetDescription();  // "Coffee + Milk + Sugar + Chocolate"
+    cout << coffee->GetCost();         // 12.5
+
+Benefits:
+    ✓ Add features dynamically at runtime
+    ✓ Avoid subclass explosion (3 components × 7 features = 21 classes!)
+    ✓ Single Responsibility Principle
+    ✓ Combine features flexibly
 ```
 
 ## Implementation Details

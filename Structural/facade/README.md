@@ -14,18 +14,87 @@ The **Facade Pattern** provides a unified, simplified interface to a set of inte
 ## Structure
 
 ```text
-+----------------------+
-|    Facade            |
-|----------------------|
-| - cpu_, memory_, hd_ |
-| + Start()            |
-| + Shutdown()         |
-+----------------------+
-  |        |          |
-  v        v          v
- +------+ +--------+ +----------+
- | CPU  | | Memory | | HardDrive| (Subsystems)
- +------+ +--------+ +----------+
+┌──────────────────────────────────────┐
+│       ComputerFacade                 │ ◄────── Facade
+├──────────────────────────────────────┤
+│ - cpu: CPU                           │
+│ - memory: Memory                     │
+│ - hard_drive: HardDrive              │
+├──────────────────────────────────────┤
+│ + Start(): void                      │
+│   {                                  │
+│     hd.Read("boot.bin")              │
+│     memory.Load(data)                │
+│     cpu.Freeze()                     │
+│     cpu.Execute(0)                   │
+│   }                                  │
+│ + Shutdown(): void                   │
+│   {                                  │
+│     cpu.Halt()                       │
+│     memory.Release()                 │
+│   }                                  │
+└──────────────────────────────────────┘
+    │         │          │
+    │ uses    │ uses     │ uses
+    v         v          v
+┌────────┐  ┌─────────┐  ┌──────────┐
+│  CPU   │  │ Memory  │  │HardDrive │ ◄────── Subsystems
+├────────┤  ├─────────┤  ├──────────┤
+│        │  │         │  │          │
+├────────┤  ├─────────┤  ├──────────┤
+│Freeze()│  │Load()   │  │Read()    │
+│Execute()  │Release()│  │Write()   │
+│Halt()  │  │         │  │          │
+└────────┘  └─────────┘  └──────────┘
+
+Complex Subsystem Without Facade:
+
+    CPU cpu;
+    Memory memory;
+    HardDrive hd;
+    
+    hd.Read("boot.bin");
+    memory.Load(boot_data);
+    cpu.Freeze();
+    cpu.Execute(0);
+    // ... complex initialization
+
+Simplified With Facade:
+
+    ComputerFacade computer;
+    computer.Start();  // One simple call!
+
+Facade Benefits:
+
+    Client Code
+        │
+        │ uses (simple interface)
+        │
+        ▼
+    ┌──────────┐
+    │ Facade   │ ◄── Single Entry Point
+    └─────┬────┘
+          │
+       ┌──┼──┬──────┐
+       │  │  │      │
+       ▼  ▼  ▼      ▼
+      Component 1,2,3,4,5...  (Complex subsystems hidden)
+
+Layer Separation:
+
+    ┌─────────────────────┐
+    │  Client Code        │
+    │  (Simple Interface) │
+    └──────────┬──────────┘
+               │
+    ┌──────────▼──────────┐
+    │ Facade Layer        │ ◄── Hides Complexity
+    └──────────┬──────────┘
+               │
+    ┌──────────▼──────────┐
+    │ Subsystem Layer     │ (Complex Implementation)
+    │ (CPU, Memory, HD...)│
+    └─────────────────────┘
 ```
 
 ## Implementation Details

@@ -15,25 +15,106 @@ The **Proxy Pattern** provides a surrogate or placeholder for another object to 
 ## Structure
 
 ```text
- +---------------+
- |   Client      |
- +---------------+
-   |
-   | uses
-   v
- +---------------+
- |    Image      | (Subject)
- |---------------|
- | + Display()   |
- +---------------+
-   ^
-   |
-   +-------------+
-   |             |
- +----------+  +--------------+
- | RealImage|  | ProxyImage   |
- +----------+  +--------------+
-         (lazy loads)
+┌──────────────────────────┐
+│      Image               │ ◄────── Subject Interface
+├──────────────────────────┤
+│                          │
+├──────────────────────────┤
+│ + Display(): void = 0    │
+│ + GetWidth(): int = 0    │
+│ + GetHeight(): int = 0   │
+└──────────────────────────┘
+         ▲
+         │ implements
+    ┌────┴──────────────────────┐
+    │                           │
+┌──────────────────┐  ┌───────────────────────┐
+│ RealImage        │  │ ProxyImage            │
+│(Real Object -    │  │(Proxy - Placeholder)  │
+│Expensive)        │  ├───────────────────────┤
+├──────────────────┤  │ - real: unique_ptr    │
+│ - filename       │  │   <RealImage>         │
+│ - image_data     │  │   (lazy initialized)  │
+│   (large!)       │  │ - filename: string    │
+├──────────────────┤  │ - width: int          │
+│ + Display()      │  │ - height: int         │
+│   (load & draw)  │  ├───────────────────────┤
+│ + GetWidth()     │  │ + Display(): void     │
+│ + GetHeight()    │  │   {                   │
+│                  │  │     if(!real)         │
+│                  │  │       real = new Real │
+│                  │  │     real->Display()   │
+│                  │  │   }                   │
+│                  │  │ + GetWidth(): int     │
+│                  │  │ + GetHeight(): int    │
+└──────────────────┘  └───────────────────────┘
+
+Lazy Loading Sequence:
+
+    Client Code
+        │
+        │ img->Display()
+        │
+        v
+    ┌─────────────────┐
+    │ ProxyImage      │
+    │ Display()       │
+    └────────┬────────┘
+             │
+      ┌──────v───────┐
+      │ real == null?│
+      └──┬───────────┘
+         │ Yes
+         v
+    ┌────────────────────┐
+    │ Create RealImage   │
+    │ (expensive!)       │
+    │ - Load from disk   │
+    │ - Decompress       │
+    │ - Allocate memory  │
+    └────────┬───────────┘
+             │
+         ┌───v────────────┐
+         │ Call           │
+         │ real->Display()│
+         └────────────────┘
+
+Proxy Types:
+
+    1. Virtual Proxy (Lazy Loading)
+       └─ Delays expensive object creation
+    
+    2. Protection Proxy (Access Control)
+       └─ Checks permissions before delegating
+    
+    3. Logging Proxy
+       └─ Logs all method calls
+    
+    4. Remote Proxy
+       └─ Communicates over network
+    
+    5. Smart Proxy
+       └─ Reference counting, caching, etc.
+
+Usage Example:
+
+    Image* img = new ProxyImage("large_photo.jpg");
+    
+    // Image not loaded yet (proxy only)
+    
+    img->Display();  // Now loads RealImage from disk
+                     // (lazy initialization)
+    
+    // Subsequent calls use cached RealImage
+    img->Display();  // Fast! (already loaded)
+
+Benefits:
+
+    ✓ Delays expensive initialization
+    ✓ Adds access control
+    ✓ Enables logging/monitoring
+    ✓ Simplifies resource management
+    ✓ Network transparency
 ```
 
 ## Implementation Details

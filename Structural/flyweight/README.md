@@ -14,25 +14,96 @@ The **Flyweight Pattern** reduces memory usage by sharing common state between m
 ## Structure
 
 ```text
-+-----------------------+
-| FlyweightFactory      |
-|-----------------------|
-| - flyweights_ (cache) |
-| + GetFlyweight()      |
-+-----------------------+
-           |
-           | creates/returns
-           v
-+------------------+
-|   Flyweight      | (Intrinsic state)
-|------------------|
-| - font_ (shared) |
-| - size_ (shared) |
-+------------------+
+┌──────────────────────────────────┐
+│   FlyweightFactory               │ ◄────── Factory with Cache
+├──────────────────────────────────┤
+│ - flyweights: map<Key, Flyweight>│
+│   (object pool)                  │
+├──────────────────────────────────┤
+│ + GetFlyweight(key): Flyweight&  │
+│   {                              │
+│     if (!pool.contains(key))     │
+│       pool[key] = new Flyweight()│
+│     return pool[key]             │
+│   }                              │
+│ + GetOrCreate(): Flyweight&      │
+└──────────────────────────────────┘
+         │
+         │ manages/caches
+         │
+┌────────v─────────────────┐
+│    Flyweight             │ ◄────── Shareable Object
+├──────────────────────────┤
+│ - font: string           │ (Intrinsic State)
+│   (SHARED, immutable)    │
+│ - size: int              │ (SHARED, immutable)
+│ - color: Color           │ (SHARED, immutable)
+├──────────────────────────┤
+│ + Display(x, y):void     │ (uses extrinsic state)
+│   {                      │
+│     render(x,y,          │
+│       font,size,color)   │
+│   }                      │
+└──────────────────────────┘
 
-Client provides Extrinsic state:
-- Position (x, y)
-- Character
+Intrinsic vs Extrinsic State:
+
+    Intrinsic (SHARED in Flyweight):
+    ┌──────────────────────┐
+    │ Font: Arial          │
+    │ Size: 12             │
+    │ Color: Black         │
+    │ Style: Bold          │
+    └──────────────────────┘
+         ▲
+         │ (stored once, reused)
+         │
+    ┌────┴────────────────┼─────────────────┐
+    │                     │                 │
+    Client 1         Client 2         Client 3
+    Char: 'A'       Char: 'B'        Char: 'C'
+    X: 10           X: 20            X: 30
+    Y: 100          Y: 100           Y: 100
+    (Extrinsic state = position + character)
+
+Usage Example:
+
+    FlyweightFactory factory;
+    
+    // Create characters with same font (shared flyweight)
+    auto char_a = factory.GetFlyweight(
+        {font: "Arial", size: 12, color: Black});
+    char_a->Display(10, 100);  // 'A' at (10,100)
+    
+    auto char_b = factory.GetFlyweight(
+        {font: "Arial", size: 12, color: Black});
+    char_b->Display(20, 100);  // 'B' at (20,100)
+    
+    // char_a and char_b share same Flyweight object!
+
+Memory Savings:
+
+    Without Flyweight (1 Million Characters):
+    ├─ 1,000,000 objects × 100 bytes = 100 MB
+    
+    With Flyweight (assuming 256 unique fonts):
+    ├─ 256 flyweight objects × 100 bytes = 25.6 KB
+    ├─ 1,000,000 clients × 16 bytes (x,y,char) = 16 MB
+    └─ Total: ~16 MB (84% reduction!)
+
+Factory Pool Management:
+
+    Pool: {Key1 → Flyweight1, Key2 → Flyweight2, ...}
+        │
+        ├─ Always reuses existing objects
+        └─ Thread-safe with synchronization
+
+Thread Safety Consideration:
+
+    FlyweightFactory (singleton or static)
+    + synchronization (mutex)
+    ├─ Lock when accessing pool
+    └─ Ensure only one thread modifies pool
 ```
 
 ## Implementation Details

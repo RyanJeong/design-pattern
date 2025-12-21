@@ -14,30 +14,75 @@ The **Adapter Pattern** makes incompatible interfaces work together by providing
 ## Structure
 
 ```text
-+-----------------+
-|  MediaPlayer    | (Target)
-+-----------------+
-      ^
-      |
-    +----+----------+
-    |               |
-+----------+  +--------------+
-| Audio    |  | MediaAdapter  | (Adapter)
-| Player   |  +--------------+
-+----------+        |
-        | uses
-        v
-      +---------------------+
-      |AdvancedMediaPlayer  | (Adaptee)
-      +---------------------+
-        ^            ^
-        |            |
-      +----+            +----+
-      |                      |
-    +--------+            +---------+
-    | Vlc    |            | Mkv     |
-    | Player |            | Player  |
-    +--------+            +---------+
+┌──────────────────────────┐
+│    MediaPlayer           │ ◄────── Target Interface
+├──────────────────────────┤
+│                          │
+├──────────────────────────┤
+│ + Play(filename): void   │
+│   = 0                    │
+└──────────────────────────┘
+         ▲
+         │ implements
+    ┌────┴──────────────────────┐
+    │                           │
+┌──────────────┐   ┌──────────────────────────┐
+│ AudioPlayer  │   │ MediaAdapter             │
+│(Concrete     │   │(Adapter - Wrapper)       │
+│Target)       │   ├──────────────────────────┤
+├──────────────┤   │ - player: unique_ptr     │
+│              │   │   <AdvancedMediaPlayer>  │
+├──────────────┤   ├──────────────────────────┤
+│ + Play():void│   │ + Play(filename): void   │
+│   {          │   │   {                      │
+│     //play   │   │     player->PlayVlc()    │
+│     audio    │   │     // or                │
+│   }          │   │     player->PlayMkv()    │
+└──────────────┘   │   }                      │
+                   └────┬─────────────────────┘
+                        │ uses
+                        │ (wraps)
+                        v
+        ┌──────────────────────────────┐
+        │ AdvancedMediaPlayer          │ ◄────── Adaptee Interface
+        │(Incompatible Interface)      │
+        ├──────────────────────────────┤
+        │ + PlayVlc(): void = 0        │
+        │ + PlayMkv(): void = 0        │
+        └──────────────────────────────┘
+                 ▲
+                 │ implements
+            ┌────┴─────────────────┐
+            │                      │
+    ┌──────────────┐      ┌──────────────┐
+    │ VlcPlayer    │      │ MkvPlayer    │
+    │(Concrete     │      │(Concrete     │
+    │Adaptee)      │      │Adaptee)      │
+    ├──────────────┤      ├──────────────┤
+    │              │      │              │
+    ├──────────────┤      ├──────────────┤
+    │ + PlayVlc()  │      │ + PlayMkv()  │
+    │ + PlayMkv()  │      │ + PlayVlc()  │
+    └──────────────┘      └──────────────┘
+
+Object Adapter Pattern (Composition):
+
+    MediaPlayer* player = new AudioPlayer();
+    player->Play("song.mp3");
+    
+    AdvancedMediaPlayer* vlc = new VlcPlayer();
+    MediaAdapter* adapter = new MediaAdapter(vlc);
+    adapter->Play("movie.vlc");  ◄── Same interface!
+                                     (internally uses PlayVlc())
+
+Adapter converts incompatible interface:
+
+    Target Interface         Adapter             Adaptee Interface
+    (MediaPlayer)            (Wrapper)           (AdvancedMediaPlayer)
+    
+    Play(file)  ────────────►  Play(file)  ────► PlayVlc(file)
+                                            │
+                                            └──► PlayMkv(file)
 ```
 
 ## Implementation Details

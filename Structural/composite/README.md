@@ -14,22 +14,86 @@ The **Composite Pattern** allows you to compose objects into tree structures to 
 ## Structure
 
 ```text
-+-------------+
-|  Component  | (Base)
-|-------------|
-| + Add()     |
-| + Display() |
-+-------------+
-       ^
-       |
-   +---+------+ 
-   |          |
- +--------+ +--------------+
- | File   | | Directory    | (Composite)
- |(Leaf)  | +--------------+
- +--------+   - children
-              + Add()
-              + Display()
+┌──────────────────────────────┐
+│      Component               │ ◄────── Abstract Base
+├──────────────────────────────┤
+│ - name: string               │
+│ - size: int                  │
+├──────────────────────────────┤
+│ + GetName(): string          │
+│ + GetSize(): int = 0         │
+│ + Display(indent: int): void │
+│   = 0                        │
+│ + Add(component): void       │
+│ + Remove(component): void    │
+└──────────────────────────────┘
+         ▲
+         │ inherits
+    ┌────┴──────────────────────┐
+    │                           │
+┌──────────────────────┐  ┌─────────────────────────┐
+│ File                 │  │ Directory               │
+│(Leaf)                │  │(Composite)              │
+├──────────────────────┤  ├─────────────────────────┤
+│ - name: string       │  │ - name: string          │
+│ - size: int          │  │ - children: vector      │
+├──────────────────────┤  │   <unique_ptr>          │
+│ + GetName(): string  │  ├─────────────────────────┤
+│ + GetSize(): int     │  │ + GetName(): string     │
+│ + Display(indent)    │  │ + GetSize(): int        │
+│   (prints file info) │  │   (sum of children)     │
+│                      │  │ + Display(indent): void │
+│                      │  │   {                     │
+│                      │  │     for(each child)     │
+│                      │  │       child->Display()  │
+│                      │  │   }                     │
+│                      │  │ + Add(child): void      │
+│                      │  │ + Remove(child): void   │
+└──────────────────────┘  └─────────────────────────┘
+
+Tree Structure Example:
+
+       ┌─────────────────┐
+       │ Directory: root │
+       │ Size: 8192 B    │
+       └────────┬────────┘
+                │
+        ┌───────┴────────┐
+        │                │
+   ┌─────────┐      ┌──────────────┐
+   │File:txt │      │Dir: home     │
+   │Size: 512│      │Size: 4096    │
+   └─────────┘      └──────┬───────┘
+                           │
+                    ┌──────┴──────┐
+                    │             │
+              ┌──────────┐   ┌──────────┐
+              │File: doc │   │File: pic │
+              │Size: 1024│   │Size: 2048│
+              └──────────┘   └──────────┘
+
+Composite Pattern Operations:
+
+    Directory root("root");
+    Directory home("home");
+    
+    home.Add(make_unique<File>("doc.txt", 1024));
+    home.Add(make_unique<File>("pic.jpg", 2048));
+    
+    root.Add(make_unique<File>("readme", 512));
+    root.Add(make_unique<Directory>("home", ...));
+    
+    root.Display(0);  // Recursively displays tree
+    
+    int total = root.GetSize();  // 512 + (1024+2048) = 3584
+
+Uniform Interface:
+
+    Component* item1 = new File("file.txt", 512);
+    Component* item2 = new Directory("folder");
+    
+    item1->Display();  // Works for both leaf and composite
+    item2->Display();  // Same interface!
 ```
 
 ## Implementation Details
